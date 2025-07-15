@@ -59,7 +59,7 @@ export function Navigation() {
 
   return (
     <nav className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
@@ -69,17 +69,17 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="hover:text-red-600 transition-colors">
-              Home
-            </Link>
             <Link href="/genre/action" className="hover:text-red-600 transition-colors">
-              Movies
+              Phim Bộ
             </Link>
             <Link href="/genre/drama" className="hover:text-red-600 transition-colors">
-              TV Shows
+              Shows
             </Link>
             <Link href="/search" className="hover:text-red-600 transition-colors">
-              Browse
+              Phim Lẻ
+            </Link>
+            <Link href="/search" className="hover:text-red-600 transition-colors">
+              Duyệt
             </Link>
           </div>
 
@@ -89,7 +89,7 @@ export function Navigation() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search movies..."
+                placeholder="Tìm kiếm phim..."
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -137,10 +137,10 @@ export function Navigation() {
             ) : (
               <div className="hidden md:flex items-center space-x-2">
                 <Link href="/login">
-                  <Button variant="ghost">Login</Button>
+                  <Button variant="ghost">Đăng Nhập</Button>
                 </Link>
                 <Link href="/register">
-                  <Button>Sign Up</Button>
+                  <Button>Đăng Ký</Button>
                 </Link>
               </div>
             )}
@@ -162,7 +162,7 @@ export function Navigation() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
-                    placeholder="Search movies..."
+                    placeholder="Tìm kiếm phim..."
                     className="pl-10"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -208,11 +208,11 @@ export function Navigation() {
                 <div className="flex flex-col space-y-2">
                   <Link href="/login">
                     <Button variant="ghost" className="w-full">
-                      Login
+                      Đăng Nhập
                     </Button>
                   </Link>
                   <Link href="/register">
-                    <Button className="w-full">Sign Up</Button>
+                    <Button className="w-full">Đăng Ký</Button>
                   </Link>
                 </div>
               )}

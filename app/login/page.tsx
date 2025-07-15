@@ -116,7 +116,7 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link href="/register" className="text-red-600 hover:underline">
-                Sign up
+                Đăng Ký
               </Link>
             </p>
           </div>

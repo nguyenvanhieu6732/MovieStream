@@ -7,14 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['placeholder.svg'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-    unoptimized: true,
+    domains: ["img.ophim.live", "img.ophim1.com"],
   },
   experimental: {
     optimizePackageImports: ['lucide-react'],
