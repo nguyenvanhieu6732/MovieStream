@@ -73,7 +73,6 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">Loading...</div>
         </div>
@@ -86,7 +85,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
 
       <div className="container mx-auto px-4 py-8">
         {/* Profile Header */}

@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
   // Check if user is accessing protected routes
-  const protectedPaths = ["/profile", "/watch"]
+  const protectedPaths = ["/profile"]
   const isProtectedPath = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path))
 
   if (isProtectedPath) {
