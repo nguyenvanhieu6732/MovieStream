@@ -11,16 +11,21 @@ import extractTextFromHtml from "@/lib/extractTextFromHtml"
 import CommentSection from "@/components/comment-section"
 import Link from "next/link"
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
+import { getImageUrl } from "@/lib/getImageUrl"
 
 export default function WatchPage({ params }: { params: { slug: string } }) {
   const { slug } = useParams()
   const [movie, setMovie] = useState<any>(null)
-  const [selectedEpisode, setSelectedEpisode] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [isLongDescription, setIsLongDescription] = useState(false)
   const [relatedMovies, setRelatedMovies] = useState<any[]>([])
+  const searchParams = useSearchParams()
+  const epFromQuery = searchParams.get("ep")
 
+  const defaultEpisode = epFromQuery ? parseInt(epFromQuery) : 0
+  const [selectedEpisode, setSelectedEpisode] = useState(defaultEpisode)
   useEffect(() => {
     const fetchMovie = async () => {
       try {
@@ -75,11 +80,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
   const descriptionText = extractTextFromHtml(movie.content)
 
-  const getImageUrl = (url: string) => {
-    if (!url) return "/placeholder.svg"
-    if (url.startsWith("http")) return url
-    return `https://img.ophim1.com/uploads/movies/${url}` // ví dụ đường dẫn chuẩn nếu bạn biết prefix
-  }
+
 
 
   return (

@@ -9,6 +9,8 @@ import Image from "next/image"
 import { Navigation } from "@/components/navigation"
 import { MovieCard } from "@/components/movie-card"
 import { mockMovies } from "@/lib/mock-data"
+import extractTextFromHtml from "@/lib/extractTextFromHtml"
+import { getImageUrl } from "@/lib/getImageUrl"
 
 interface OPhimMovie {
   _id: string
@@ -33,7 +35,7 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(10) // set mặc định
 
-  const featuredMovies = mockMovies.slice(0, 3)
+  const featuredMovies = latestMovies.slice(0, 3)
   const genres = ["all", "action", "drama", "comedy", "thriller", "sci-fi", "horror"]
 
   useEffect(() => {
@@ -59,8 +61,8 @@ export default function HomePage() {
     selectedGenre === "all"
       ? latestMovies
       : latestMovies.filter((movie) =>
-          movie.categories?.some((c) => c.name.toLowerCase().includes(selectedGenre))
-        )
+        movie.categories?.some((c) => c.name.toLowerCase().includes(selectedGenre))
+      )
 
   const renderPagination = () => {
     const pages = []
@@ -105,40 +107,42 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-     
-
       <section className="relative h-[70vh] overflow-hidden">
         <div className="relative w-full h-full">
           {featuredMovies.map((movie, index) => (
             <div
-              key={movie.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentSlide ? "opacity-100" : "opacity-0"
-              }`}
+              key={movie._id}
+              className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                }`}
             >
-              <Image src={movie.backdrop} alt={movie.title} fill className="object-cover" />
+              <Image
+                src={getImageUrl(movie.poster_url)}
+                alt={movie.name}
+                fill
+                className="object-cover"
+              />
               <div className="absolute inset-0 bg-black/50" />
               <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
                 <div className="max-w-2xl">
-                  <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">{movie.title}</h1>
-                  <p className="text-lg text-gray-200 mb-6 line-clamp-3">{movie.description}</p>
+                  <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">{movie.name}</h1>
+                  {/* <p className="text-lg text-gray-200 mb-6 line-clamp-3">{extractTextFromHtml(movie.content)}</p> */}
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {movie.genres.map((genre) => (
-                      <Badge key={genre} variant="secondary" className="capitalize">
-                        {genre}
+                    {movie.categories?.map((genre) => (
+                      <Badge key={genre.name} variant="secondary" className="capitalize">
+                        {genre.name}
                       </Badge>
                     ))}
                   </div>
                   <div className="flex gap-4">
-                    <Link href={`/watch/${movie.id}`}>
+                    <Link href={`/watch/${movie.slug}`}>
                       <Button size="lg" className="bg-red-600 hover:bg-red-700">
                         <Play className="mr-2 h-5 w-5" />
-                        Watch Now
+                        Xem ngay
                       </Button>
                     </Link>
-                    <Link href={`/movie/${movie.id}`}>
+                    <Link href={`/movie/${movie.slug}`}>
                       <Button size="lg" variant="outline" className="text-white border-white">
-                        More Info
+                        Thông tin thêm
                       </Button>
                     </Link>
                   </div>
@@ -168,9 +172,8 @@ export default function HomePage() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full ${
-                index === currentSlide ? "bg-white" : "bg-white/50"
-              }`}
+              className={`w-3 h-3 rounded-full ${index === currentSlide ? "bg-white" : "bg-white/50"
+                }`}
             />
           ))}
         </div>

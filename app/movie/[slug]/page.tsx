@@ -133,7 +133,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
 
             {/* Actions */}
             <div className="flex flex-wrap gap-4 mb-8">
-              <Link href={`/watch/${params.slug}`}>
+              <Link href={`/watch/${params.slug}?ep=${selectedEpisode}`}>
                 <Button
                   size="lg"
                   className="bg-red-600 hover:bg-red-700 text-white"
