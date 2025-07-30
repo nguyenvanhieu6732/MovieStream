@@ -11,21 +11,8 @@ import { MovieCard } from "@/components/movie-card"
 import { mockMovies } from "@/lib/mock-data"
 import extractTextFromHtml from "@/lib/extractTextFromHtml"
 import { getImageUrl } from "@/lib/getImageUrl"
+import { OPhimMovie } from "@/lib/interface"
 
-interface OPhimMovie {
-  _id: string
-  name: string
-  slug: string
-  origin_name: string
-  poster_url: string
-  thumb_url: string
-  year: number
-  time?: string
-  categories?: { name: string }[]
-  tmdb?: {
-    vote_average?: number
-  }
-}
 
 
 export default function HomePage() {

@@ -1,25 +1,34 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Search, Menu, X, Sun, Moon, Film, LogOut, User, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Search, Menu, X, Moon, Sun, Film, User, Heart, LogOut } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu"
+import { useDebounce } from "@/hooks/useDebounce"
+import { OPhimMovie } from "@/lib/interface"
+import { getImageUrl } from "@/lib/getImageUrl"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<OPhimMovie[]>([])
+  const [showDropdown, setShowDropdown] = useState(false)
+
+  const debouncedQuery = useDebounce(searchQuery, 400)
   const router = useRouter()
 
   useEffect(() => {
-    // Check for saved theme preference
     const savedTheme = localStorage.getItem("theme")
     const savedUser = localStorage.getItem("user")
 
@@ -33,6 +42,37 @@ export function Navigation() {
     }
   }, [])
 
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!debouncedQuery.trim()) {
+        setSearchResults([])
+        setShowDropdown(false)
+        return
+      }
+
+      try {
+        const res = await fetch(`https://ophim1.com/v1/api/tim-kiem?keyword=${debouncedQuery}`)
+        const json = await res.json()
+        setSearchResults(json.data?.items?.slice(0, 5) || [])
+        setShowDropdown(true)
+      } catch (error) {
+        console.error("Lỗi tìm kiếm:", error)
+        setSearchResults([])
+        setShowDropdown(false)
+      }
+    }
+
+    fetchResults()
+  }, [debouncedQuery])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+      setShowDropdown(false)
+    }
+  }
+
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode)
     if (!isDarkMode) {
@@ -44,13 +84,6 @@ export function Navigation() {
     }
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
-    }
-  }
-
   const handleLogout = () => {
     localStorage.removeItem("user")
     setIsLoggedIn(false)
@@ -58,7 +91,7 @@ export function Navigation() {
   }
 
   return (
-    <nav className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b sticky top-0 z-50">
+    <nav className="bg-background border-b sticky top-0 z-50">
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -67,70 +100,85 @@ export function Navigation() {
             <span className="text-xl font-bold">MovieStream</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/genre/action" className="hover:text-red-600 transition-colors">
-              Phim Bộ
-            </Link>
-            <Link href="/genre/drama" className="hover:text-red-600 transition-colors">
-              Shows
-            </Link>
-            <Link href="/search" className="hover:text-red-600 transition-colors">
-              Phim Lẻ
-            </Link>
-            <Link href="/search" className="hover:text-red-600 transition-colors">
-              Duyệt
-            </Link>
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/genre/action">Phim Bộ</Link>
+            <Link href="/genre/drama">Shows</Link>
+            <Link href="/search">Phim Lẻ</Link>
+            <Link href="/search">Duyệt</Link>
           </div>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center space-x-2 flex-1 max-w-md mx-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Tìm kiếm phim..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md relative mx-8">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Tìm kiếm phim..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+              }}
+              onFocus={() => {
+                if (searchResults.length > 0) setShowDropdown(true)
+              }}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+            />
+            {showDropdown && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border z-50 rounded shadow-lg max-h-96 overflow-auto">
+                {searchResults.map((movie) => (
+                  <Link
+                    key={movie._id}
+                    href={`/movie/${movie.slug}`}
+                    onClick={() => setShowDropdown(false)}
+                    className="flex items-center px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 gap-3"
+                  >
+                    <img
+                      src={getImageUrl(movie.thumb_url)}
+                      alt={movie.name}
+                      className="w-12 h-16 object-cover rounded"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{movie.name}</span>
+                      <span className="text-xs text-muted-foreground">{movie.year}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </form>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Theme Toggle */}
+          {/* Right Actions */}
+          <div className="flex items-center space-x-2">
+            {/* Theme toggle */}
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden md:flex">
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
-            {/* User Actions */}
+            {/* User */}
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarImage src="/placeholder.svg" />
+                      <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
+                      <User className="mr-2 h-4 w-4" /> Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center">
-                      <Heart className="mr-2 h-4 w-4" />
-                      Watchlist
+                    <Link href="/watchlist" className="flex items-center">
+                      <Heart className="mr-2 h-4 w-4" /> Watchlist
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    <LogOut className="mr-2 h-4 w-4" /> Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -145,80 +193,12 @@ export function Navigation() {
               </div>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile menu toggle */}
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <div className="flex flex-col space-y-4">
-              {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="flex items-center space-x-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Tìm kiếm phim..."
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </form>
-
-              {/* Mobile Navigation Links */}
-              <Link href="/" className="block py-2 hover:text-red-600 transition-colors">
-                Home
-              </Link>
-              <Link href="/genre/action" className="block py-2 hover:text-red-600 transition-colors">
-                Movies
-              </Link>
-              <Link href="/genre/drama" className="block py-2 hover:text-red-600 transition-colors">
-                TV Shows
-              </Link>
-              <Link href="/search" className="block py-2 hover:text-red-600 transition-colors">
-                Browse
-              </Link>
-
-              {/* Mobile Theme Toggle */}
-              <Button variant="ghost" onClick={toggleTheme} className="justify-start">
-                {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-                {isDarkMode ? "Light Mode" : "Dark Mode"}
-              </Button>
-
-              {/* Mobile Auth */}
-              {isLoggedIn ? (
-                <div className="flex flex-col space-y-2">
-                  <Link href="/profile">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" onClick={handleLogout} className="w-full justify-start">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col space-y-2">
-                  <Link href="/login">
-                    <Button variant="ghost" className="w-full">
-                      Đăng Nhập
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button className="w-full">Đăng Ký</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   )

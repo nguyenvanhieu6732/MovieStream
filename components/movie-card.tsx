@@ -7,24 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Star, Play, Heart, Plus } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { OPhimMovie } from "@/lib/interface"
 
-interface Movie {
-  _id: string
-  name: string
-  origin_name: string
-  slug: string
-  poster_url: string
-  thumb_url: string
-  year: number
-  tmdb?: {
-    vote_average?: number
-  }
-  categories?: { name: string }[]
-  time?: string
-}
 
 interface MovieCardProps {
-  movie: Movie
+  movie: OPhimMovie
 }
 
 export function MovieCard({ movie }: MovieCardProps) {
@@ -83,7 +70,7 @@ export function MovieCard({ movie }: MovieCardProps) {
         {/* Rating Badge */}
         <div className="absolute top-2 right-2 bg-black/70 rounded px-2 py-1 flex items-center gap-1">
           <Star className="h-3 w-3 text-yellow-400 fill-current" />
-          <span className="text-xs text-white">{rating}</span>
+          <span className="text-xs text-white">{rating === "0.0" ? "N/A" : rating}</span>
         </div>
       </div>
 

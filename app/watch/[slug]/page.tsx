@@ -63,10 +63,9 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
   if (!movie) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 text-center text-white">
-          Đang tải dữ liệu phim...
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-600 mb-6" />
+        <p className="text-lg font-semibold animate-pulse">Đang tải phim, xin vui lòng chờ...</p>
       </div>
     )
   }
