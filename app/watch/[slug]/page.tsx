@@ -13,6 +13,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { getImageUrl } from "@/lib/getImageUrl"
+import { LoadingEffect } from "@/components/loading-effect"
 
 export default function WatchPage({ params }: { params: { slug: string } }) {
   const { slug } = useParams()
@@ -63,10 +64,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
   if (!movie) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-600 mb-6" />
-        <p className="text-lg font-semibold animate-pulse">Đang tải phim, xin vui lòng chờ...</p>
-      </div>
+      <LoadingEffect message="Đang tải thông tin phim..." />
     )
   }
 
@@ -90,31 +88,52 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
         </div>
 
         {/* Video player */}
-        <Card className="mb-6 bg-black border-gray-800">
-          <div className="aspect-video relative rounded-md overflow-hidden">
-            {!isPlaying ? (
-              <>
-                <img
-                  src={movie.poster_url}
-                  alt={`Poster ${movie.name}`}
-                  className="w-full h-full object-cover brightness-75"
-                />
-                <button
-                  onClick={() => setIsPlaying(true)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition"
-                >
-                  <Play className="w-12 h-12 text-white" />
-                </button>
-              </>
-            ) : (
-              <iframe
-                src={currentEpisode.link_embed}
-                allowFullScreen
-                className="w-full h-full"
-              />
-            )}
-          </div>
-        </Card>
+<Card className="mb-6 bg-black border-gray-800">
+  <div className="aspect-video relative rounded-md overflow-hidden">
+    {!isPlaying ? (
+      <>
+        <img
+          src={movie.poster_url}
+          alt={`Poster ${movie.name}`}
+          className="w-full h-full object-cover brightness-75"
+        />
+        <button
+          onClick={() => setIsPlaying(true)}
+          className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition"
+        >
+          <Play className="w-12 h-12 text-white" />
+        </button>
+      </>
+    ) : currentEpisode.link_embed ? (
+      <iframe
+        src={currentEpisode.link_embed}
+        allowFullScreen
+        className="w-full h-full"
+      />
+    ) : (
+      <div className="w-full h-full flex items-center justify-center bg-black/70 text-red-500">
+        <div className="text-center p-4 border border-red-500 rounded-lg bg-black/60 backdrop-blur-sm">
+          <svg
+            className="mx-auto mb-2 h-10 w-10 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01M12 19c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z"
+            />
+          </svg>
+          <p className="text-lg font-semibold">Không thể phát video</p>
+          <p className="text-sm text-white/80">Link bị lỗi hoặc không tồn tại. Vui lòng thử lại sau.</p>
+        </div>
+      </div>
+    )}
+  </div>
+</Card>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main content */}

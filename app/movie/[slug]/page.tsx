@@ -10,6 +10,7 @@ import Link from "next/link"
 import Image from "next/image"
 import extractTextFromHtml from "@/lib/extractTextFromHtml"
 import CommentSection from "@/components/comment-section"
+import { LoadingEffect } from "@/components/loading-effect"
 
 export default function MovieDetailPage({ params }: { params: { slug: string } }) {
   const [movie, setMovie] = useState<any>(null)
@@ -55,10 +56,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
   }
 
   if (!movie) return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-600 mb-6" />
-      <p className="text-lg font-semibold animate-pulse">Đang tải phim, xin vui lòng chờ...</p>
-    </div>
+    <LoadingEffect/>
   )
 
   return (

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { MovieCard } from "@/components/movie-card"
 import { useDebounce } from "@/hooks/useDebounce"
+import { LoadingEffect } from "@/components/loading-effect"
 
 export default function SearchPage() {
   const router = useRouter()
@@ -67,10 +68,7 @@ export default function SearchPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-600 mb-6" />
-        <p className="text-lg font-semibold animate-pulse">Đang tải phim, xin vui lòng chờ...</p>
-      </div>
+      <LoadingEffect message="Đang tải kết quả tìm kiếm..." />
     )
   }
 
@@ -96,10 +94,7 @@ export default function SearchPage() {
         </form>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-600 mb-6" />
-            <p className="text-lg font-semibold animate-pulse">Đang tải kết quả...</p>
-          </div>
+          <LoadingEffect message="Đang tải kết quả tìm kiếm..." />
         ) : results.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
             {results.map((movie) => (
