@@ -66,13 +66,6 @@ export default function SearchPage() {
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  if (loading) {
-    return (
-      <LoadingEffect message="Đang tải kết quả tìm kiếm..." />
-    )
-  }
-
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -102,7 +95,7 @@ export default function SearchPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
+          <div className="text-center py-36">
             <h3 className="text-xl font-semibold mb-2">Không tìm thấy kết quả</h3>
             <p className="text-muted-foreground">Thử lại với từ khóa khác</p>
           </div>

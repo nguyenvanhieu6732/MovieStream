@@ -6,10 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Play, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { Navigation } from "@/components/navigation"
 import { MovieCard } from "@/components/movie-card"
-import { mockMovies } from "@/lib/mock-data"
-import extractTextFromHtml from "@/lib/extractTextFromHtml"
 import { getImageUrl } from "@/lib/getImageUrl"
 import { OPhimMovie } from "@/lib/interface"
 import { Pagination } from "@/components/pagination"
@@ -18,13 +15,13 @@ import { Pagination } from "@/components/pagination"
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [selectedGenre, setSelectedGenre] = useState("all")
+  const [selectedGenre, setSelectedGenre] = useState("Mới Cập Nhật")
   const [latestMovies, setLatestMovies] = useState<OPhimMovie[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(10) // set mặc định
 
   const featuredMovies = latestMovies.slice(0, 3)
-  const genres = ["all", "action", "drama", "comedy", "thriller", "sci-fi", "horror"]
+  const genres = ["Mới Cập Nhật", "Phim Lẻ", "Phim Bộ", "Hành Động", "Hài Hước", "Tình Cảm", "Hoạt Hình", "Kinh Dị"]
 
   useEffect(() => {
     fetch(`https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=${currentPage}`)
@@ -46,7 +43,7 @@ export default function HomePage() {
   }, [featuredMovies.length])
 
   const filteredLatest =
-    selectedGenre === "all"
+    selectedGenre === "Mới Cập Nhật"
       ? latestMovies
       : latestMovies.filter((movie) =>
         movie.categories?.some((c) => c.name.toLowerCase().includes(selectedGenre))
@@ -73,7 +70,6 @@ export default function HomePage() {
               <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
                 <div className="max-w-2xl">
                   <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">{movie.name}</h1>
-                  {/* <p className="text-lg text-gray-200 mb-6 line-clamp-3">{extractTextFromHtml(movie.content)}</p> */}
                   <div className="flex flex-wrap gap-2 mb-6">
                     {movie.categories?.map((genre) => (
                       <Badge key={genre.name} variant="secondary" className="capitalize">
@@ -129,9 +125,10 @@ export default function HomePage() {
 
       <div className="container mx-auto px-4 py-8">
         <section className="mb-12">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Phim Mới Nhất</h2>
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+            <h2 className="text-2xl font-bold text-center md:text-left">Phim {selectedGenre}</h2>
+
+            <div className="flex flex-wrap gap-2 justify-center md:justify-end">
               {genres.map((genre) => (
                 <Button
                   key={genre}
@@ -145,6 +142,7 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {filteredLatest.map((movie) => (
               <MovieCard key={movie._id} movie={movie} />

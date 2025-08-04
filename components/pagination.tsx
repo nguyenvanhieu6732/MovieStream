@@ -1,69 +1,71 @@
 "use client"
 
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PaginationProps } from "@/lib/interface"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-
-
+import { useState, useEffect } from "react"
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  const maxVisible = 5
-  const pages: (number | string)[] = []
+  const [inputPage, setInputPage] = useState(currentPage)
 
-  if (totalPages <= maxVisible) {
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i)
+  useEffect(() => {
+    setInputPage(currentPage)
+  }, [currentPage])
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value)
+    if (val >= 1 && val <= totalPages) {
+      setInputPage(val)
+    } else {
+      setInputPage(NaN)
     }
-  } else {
-    const startPage = Math.max(2, currentPage - 1)
-    const endPage = Math.min(totalPages - 1, currentPage + 1)
+  }
 
-    pages.push(1)
-    if (startPage > 2) pages.push("...")
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
+  const handleInputBlur = () => {
+    if (!isNaN(inputPage)) {
+      onPageChange(inputPage)
+    } else {
+      setInputPage(currentPage)
     }
-
-    if (endPage < totalPages - 1) pages.push("...")
-    pages.push(totalPages)
   }
 
   return (
-    <div className="flex justify-center items-center gap-2 mt-6">
+    <div className="flex justify-center items-center gap-4 mt-6">
+      {/* Nút trái */}
       <Button
         size="icon"
-        variant="outline"
+        className="rounded-full w-10 h-10 hover:bg-white/10 transition"
+        variant="ghost"
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className="w-5 h-5" />
       </Button>
 
-      {pages.map((page, index) =>
-        typeof page === "number" ? (
-          <Button
-            key={index}
-            variant={page === currentPage ? "default" : "outline"}
-            onClick={() => onPageChange(page)}
-            className="w-10 h-10 p-0"
-          >
-            {page}
-          </Button>
-        ) : (
-          <span key={index} className="px-2 text-muted-foreground">
-            ...
-          </span>
-        )
-      )}
+      {/* Ô giữa */}
+      <div className="flex items-center gap-2 bg-muted px-4 py-2 rounded-full text-white">
+        <span>Trang</span>
+        <input
+          type="number"
+          min={1}
+          max={totalPages}
+          value={isNaN(inputPage) ? "" : inputPage}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          className="w-14 h-8 rounded-md bg-background text-center text-white outline-none border border-border appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+        <span>/ {totalPages}</span>
+      </div>
 
+      {/* Nút phải */}
       <Button
         size="icon"
-        variant="outline"
+        className="rounded-full w-10 h-10 hover:bg-white/10 transition"
+        variant="ghost"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className="w-5 h-5" />
       </Button>
     </div>
   )

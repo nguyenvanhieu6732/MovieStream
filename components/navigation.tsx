@@ -16,6 +16,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce"
 import { OPhimMovie } from "@/lib/interface"
 import { getImageUrl } from "@/lib/getImageUrl"
+import Image from "next/image"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -102,9 +103,9 @@ export function Navigation() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/genre/action">Phim Bộ</Link>
-            <Link href="/genre/drama">Shows</Link>
-            <Link href="/search">Phim Lẻ</Link>
+            {/* <Link href="/genre/action">Trang Chủ</Link> */}
+            <Link href="/genre/drama">Thể Loại</Link>
+            <Link href="/search">Quốc Gia</Link>
             <Link href="/search">Duyệt</Link>
           </div>
 
@@ -133,7 +134,7 @@ export function Navigation() {
                     onClick={() => setShowDropdown(false)}
                     className="flex items-center px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 gap-3"
                   >
-                    <img
+                    <Image
                       src={getImageUrl(movie.thumb_url)}
                       alt={movie.name}
                       className="w-12 h-16 object-cover rounded"

@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Navigation } from "@/components/navigation"
 import { Play, Star } from "lucide-react"
 import extractTextFromHtml from "@/lib/extractTextFromHtml"
 import CommentSection from "@/components/comment-section"
@@ -92,7 +91,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
   <div className="aspect-video relative rounded-md overflow-hidden">
     {!isPlaying ? (
       <>
-        <img
+        <Image
           src={movie.poster_url}
           alt={`Poster ${movie.name}`}
           className="w-full h-full object-cover brightness-75"
