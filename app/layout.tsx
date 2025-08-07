@@ -5,17 +5,17 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Footer from "@/components/footer"
 import { Navigation } from "@/components/navigation"
-import Head from "next/head"
+import SplashProvider from "@/components/SplashProvider" // <- thêm dòng này
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-title: "MovieStream",
+  title: "MovieStream",
   description: "Stream the latest movies and TV shows online.",
   openGraph: {
     title: "MovieStream",
     description: "Stream the latest movies and TV shows online.",
-    images: ["/logo.png"], // <- đây dùng path trong public
+    images: ["/logo.png"],
   },
 }
 
@@ -28,9 +28,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <Navigation />
-          {children}
-          <Footer />
+          <SplashProvider> 
+            <Navigation />
+            {children}
+            <Footer />
+          </SplashProvider>
         </ThemeProvider>
       </body>
     </html>

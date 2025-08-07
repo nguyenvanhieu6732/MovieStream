@@ -2,6 +2,7 @@
 
 
 import { Facebook, Instagram, Youtube, ArrowUp, Film } from "lucide-react"
+import ScrollToTopButton from "./ScrollToTopButton"
 
 export default function Footer() {
     return (
@@ -58,13 +59,7 @@ export default function Footer() {
             </div>
 
             {/* Scroll to top */}
-            <button
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md"
-                aria-label="Scroll to top"
-            >
-                <ArrowUp size={18} />
-            </button>
+            <ScrollToTopButton />
         </footer>
     )
 }
