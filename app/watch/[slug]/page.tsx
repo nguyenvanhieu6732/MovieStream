@@ -7,12 +7,12 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Play, Star } from "lucide-react"
 import extractTextFromHtml from "@/lib/extractTextFromHtml"
-import CommentSection from "@/components/comment-section"
+import CommentSection from "@/components/detailMovie/comment-section"
 import Link from "next/link"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { getImageUrl } from "@/lib/getImageUrl"
-import { LoadingEffect } from "@/components/loading-effect"
+import { LoadingEffect } from "@/components/effect/loading-effect"
 
 export default function WatchPage({ params }: { params: { slug: string } }) {
   const { slug } = useParams()

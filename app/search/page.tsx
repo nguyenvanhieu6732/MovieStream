@@ -4,9 +4,9 @@ import { useState, useEffect } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { MovieCard } from "@/components/movie-card"
+import { MovieCard } from "@/components/detailMovie/movie-card"
 import { useDebounce } from "@/hooks/useDebounce"
-import { LoadingEffect } from "@/components/loading-effect"
+import { LoadingEffect } from "@/components/effect/loading-effect"
 
 export default function SearchPage() {
   const router = useRouter()

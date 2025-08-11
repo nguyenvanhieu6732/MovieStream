@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -19,7 +19,7 @@ import {
 
 import { useDebounce } from "@/hooks/useDebounce"
 import { OPhimMovie } from "@/lib/interface"
-import { getImageUrl } from "@/lib/getImageUrl"
+import { SearchDropdown } from "../home/SearchDropdown"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -32,27 +32,20 @@ export function Navigation() {
   const router = useRouter()
   const debouncedQuery = useDebounce(searchQuery, 400)
 
+  // Prefetch và setup theme, login
   useEffect(() => {
-    // Auto theme theo hệ điều hành nếu chưa lưu
     const savedTheme = localStorage.getItem("theme")
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    const currentTheme = savedTheme || (prefersDark ? "dark" : "light")
+    document.documentElement.classList.toggle("dark", currentTheme === "dark")
+    setIsDarkMode(currentTheme === "dark")
+    localStorage.setItem("theme", currentTheme)
 
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark")
-      document.documentElement.classList.toggle("dark", savedTheme === "dark")
-    } else {
-      setIsDarkMode(prefersDark)
-      document.documentElement.classList.toggle("dark", prefersDark)
-      localStorage.setItem("theme", prefersDark ? "dark" : "light")
-    }
-
-    // Kiểm tra đăng nhập
-    const user = localStorage.getItem("user")
-    setIsLoggedIn(!!user)
-
+    setIsLoggedIn(!!localStorage.getItem("user"))
     router.prefetch("/search")
-  }, [])
+  }, [router])
 
+  // Gợi ý tìm kiếm
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setSearchResults([])
@@ -76,13 +69,15 @@ export function Navigation() {
     fetchResults()
   }, [debouncedQuery])
 
-  const handleSearch = (e: React.FormEvent) => {
+  // ===== HANDLERS =====
+
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     const query = searchQuery.trim()
     if (!query) return
     router.push(`/search?q=${encodeURIComponent(query)}`)
     setShowDropdown(false)
-  }
+  }, [searchQuery, router])
 
   let blurTimeout: NodeJS.Timeout
   const handleBlur = () => {
@@ -94,7 +89,7 @@ export function Navigation() {
   }
 
   const toggleTheme = () => {
-    const newTheme = !isDarkMode ? "dark" : "light"
+    const newTheme = isDarkMode ? "light" : "dark"
     document.documentElement.classList.toggle("dark", newTheme === "dark")
     localStorage.setItem("theme", newTheme)
     setIsDarkMode(newTheme === "dark")
@@ -113,6 +108,8 @@ export function Navigation() {
     { href: "/search", label: "Quốc Gia" }
   ]
 
+  // ===== RENDER =====
+
   return (
     <nav className="bg-background border-b sticky top-0 z-50">
       <div className="mx-4">
@@ -125,8 +122,8 @@ export function Navigation() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>{link.label}</Link>
+            {navLinks.map(({ href, label }) => (
+              <Link key={href} href={href}>{label}</Link>
             ))}
           </div>
 
@@ -138,7 +135,7 @@ export function Navigation() {
               placeholder="Tìm kiếm phim..."
               className="pl-10"
               value={searchQuery}
-              onChange={(e: any) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={handleFocus}
               onBlur={handleBlur}
             />
@@ -183,70 +180,35 @@ export function Navigation() {
             )}
 
             {/* Mobile menu toggle */}
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(prev => !prev)}>
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden flex flex-col space-y-2 py-2">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setIsMenuOpen(false)} className="px-2">
-                {link.label}
+            {navLinks.map(({ href, label }) => (
+              <Link key={href} href={href} onClick={() => setIsMenuOpen(false)} className="px-2">
+                {label}
               </Link>
             ))}
-            {!isLoggedIn ? (
-              <>
-                <Link href="/login"><Button variant="ghost" className="w-full">Đăng Nhập</Button></Link>
-                <Link href="/register"><Button className="w-full">Đăng Ký</Button></Link>
-              </>
-            ) : (
+            {isLoggedIn ? (
               <>
                 <Link href="/profile"><Button variant="ghost" className="w-full">Profile</Button></Link>
                 <Link href="/watchlist"><Button variant="ghost" className="w-full">Watchlist</Button></Link>
                 <Button onClick={handleLogout} className="w-full" variant="destructive">Đăng Xuất</Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login"><Button variant="ghost" className="w-full">Đăng Nhập</Button></Link>
+                <Link href="/register"><Button className="w-full">Đăng Ký</Button></Link>
               </>
             )}
           </div>
         )}
       </div>
     </nav>
-  )
-}
-
-function SearchDropdown({
-  results,
-  onClose
-}: {
-  results: OPhimMovie[]
-  onClose: () => void
-}) {
-  return (
-    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border z-50 rounded shadow-lg max-h-96 overflow-auto">
-      {results.map((movie) => (
-        <Link
-          key={movie._id}
-          href={`/movie/${movie.slug}`}
-          onClick={onClose}
-          className="flex items-center px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 gap-3"
-        >
-          <Image
-            src={getImageUrl(movie.thumb_url)}
-            alt={movie.name}
-            width={48}
-            height={64}
-            className="object-cover rounded"
-            loading="lazy"
-            unoptimized
-          />
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{movie.name}</span>
-            <span className="text-xs text-muted-foreground">{movie.year}</span>
-          </div>
-        </Link>
-      ))}
-    </div>
   )
 }

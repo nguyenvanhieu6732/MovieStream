@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Navigation } from "@/components/navigation";
+import { Navigation } from "@/components/layout/navigation";
 import { Calendar, Clock, Heart, Play, Share2, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,11 +12,11 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 import { ErrorBoundary } from "react-error-boundary";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
-import { LoadingEffect } from "@/components/loading-effect";
+import { LoadingEffect } from "@/components/effect/loading-effect";
 import { MovieItem } from "@/lib/interface";
 
 // Lazy load CommentSection
-const CommentSection = dynamic(() => import("@/components/comment-section"), {
+const CommentSection = dynamic(() => import("@/components/detailMovie/comment-section"), {
   loading: () => <LoadingEffect />,
   ssr: false,
 });

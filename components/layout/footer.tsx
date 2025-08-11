@@ -2,7 +2,7 @@
 
 
 import { Facebook, Instagram, Youtube, ArrowUp, Film } from "lucide-react"
-import ScrollToTopButton from "./ScrollToTopButton"
+import ScrollToTopButton from "../scrollEffect/ScrollToTopButton"
 
 export default function Footer() {
     return (

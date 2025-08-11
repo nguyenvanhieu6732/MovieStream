@@ -128,3 +128,22 @@ export interface PaginationProps {
   totalPages: number
   onPageChange: (page: number) => void
 }
+
+export interface PropsMovieHorizontalSlider {
+  slug: string // bắt buộc
+  title?: string
+  gradient?: string
+  page?: number
+  limit?: number
+  sort_field?: string
+  sort_type?: string
+  category?: string
+  country?: string
+  year?: string
+}
+
+export interface SectionHeaderProps {
+  country?: string;
+  link?: string;
+  gradient?: string; // ví dụ: "from-purple-400 via-purple-500 to-white"
+}

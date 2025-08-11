@@ -1,24 +1,60 @@
-import { Suspense } from "react"
-import { Navigation } from "@/components/navigation"
-import { MovieGrid } from "@/components/movie-grid"
-import { MovieGridSkeleton } from "@/components/movie-grid-skeleton"
+"use client";
 
-export default function MoviesPage() {
-  return (
-    <div className="min-h-screen bg-background">
+import { useEffect, useState } from "react";
+import { OPhimMovie } from "@/lib/interface";
+import MovieGrid from "@/components/detailMovie/movie-grid";
+import { Pagination } from "@/components/detailMovie/pagination";
+import { LoadingEffect } from "@/components/effect/loading-effect";
 
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">All Movies</h1>
+async function fetchMovies(countrySlug: string, page: number) {
+  const apiUrl = `https://ophim1.com/v1/api/danh-sach/phim-moi?page=${page}
+  &limit=30&sort_field=modified.time&sort_type=desc&year=2025&country=${countrySlug}`;
 
-        <Suspense fallback={<MovieGridSkeleton />}>
-          <MovieGrid />
-        </Suspense>
-      </div>
-    </div>
-  )
+  const res = await fetch(apiUrl);
+  if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+  const data = await res.json();
+
+  return {
+    movies: data.data?.items || [],
+    totalPages: 2
+  };
 }
 
-export const metadata = {
-  title: "Movies - MovieStream",
-  description: "Browse all movies available on MovieStream",
+export default function MoviesPage({ searchParams }: { searchParams: { country?: string } }) {
+  const country = searchParams.country || "";
+  const [movies, setMovies] = useState<OPhimMovie[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+
+  useEffect(() => {
+    setLoading(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    fetchMovies(country, currentPage).then((data) => {
+      setMovies(data.movies);
+      setTotalPages(data.totalPages);
+      setLoading(false);
+    });
+  }, [country, currentPage]);
+
+  return (
+    <div className="min-h-screen p-4">
+      <h1 className="text-2xl font-bold mb-6">
+        {country ? `Phim ${movies[0]?.country?.[0]?.name} mới nhất` : "Tất cả phim"}
+      </h1>
+
+      {loading ? (
+        <LoadingEffect />
+      ) : (
+        <MovieGrid movies={movies} />
+      )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </div>
+  );
 }

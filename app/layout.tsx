@@ -2,10 +2,10 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import Footer from "@/components/footer"
-import { Navigation } from "@/components/navigation"
-import SplashProvider from "@/components/SplashProvider" // <- thêm dòng này
+import { ThemeProvider } from "@/components/layout/theme-provider"
+import Footer from "@/components/layout/footer"
+import { Navigation } from "@/components/layout/navigation"
+import SplashProvider from "@/components/effect/SplashProvider" 
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "MovieStream",
     description: "Stream the latest movies and TV shows online.",
-    images: ["/logo.png"],
+    images: ["/favicon.ico"],
   },
 }
 
