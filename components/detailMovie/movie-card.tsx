@@ -8,18 +8,24 @@ import { getImageUrl } from "@/lib/getImageUrl";
 
 interface Props {
   movie: OPhimMovie;
+  variant?: "thumbnail" | "poster"; // <-- thêm variant
 }
 
-function MovieCardComponent({ movie }: Props) {
+function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
+  // chọn aspect ratio dựa theo variant
+  const aspectClass = variant === "thumbnail" ? "aspect-[2/3]" : "aspect-[16/9]";
+
   return (
     <Link
       href={`/movie/${movie.slug}`}
       prefetch={true}
       className="group block rounded-lg overflow-hidden shadow hover:shadow-lg transition relative"
     >
-      <div className="relative aspect-[2/3] w-full">
+      <div className={`relative w-full ${aspectClass}`}>
         <Image
-          src={getImageUrl(movie.thumb_url)}
+          src={getImageUrl(
+            variant === "thumbnail" ? movie.thumb_url : movie.poster_url
+          )}
           alt={movie.name}
           fill
           sizes="(max-width: 768px) 50vw, 20vw"
@@ -33,11 +39,14 @@ function MovieCardComponent({ movie }: Props) {
             {movie.episode_current}
           </span>
         )}
+        {movie.lang && (
+          <span className="absolute bottom-2 right-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded">
+            {movie.lang}
+          </span>
+        )}
       </div>
       <div className="p-2">
-        <h3 className="text-sm font-semibold text-white line-clamp-1">
-          {movie.name}
-        </h3>
+        <h3 className="text-sm font-semibold line-clamp-1">{movie.name}</h3>
         <p className="text-xs text-gray-400">{movie.origin_name}</p>
       </div>
     </Link>

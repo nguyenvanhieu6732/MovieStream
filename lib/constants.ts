@@ -12,7 +12,25 @@ export const MOVIE_SLUG = {
   PHIM_BO_HOAN_THANH: "phim-bo-hoan-thanh",
   PHIM_SAP_CHIEU: "phim-sap-chieu",
   SUBTEAM: "subteam",
+  PHIM_CHIEU_RAP: "phim-chieu-rap"
 } as const
+
+export const MOVIE_SLUG_LABEL: Record<string, string> = {
+  "phim-moi": "Phim mới",
+  "phim-bo": "Phim bộ",
+  "phim-le": "Phim lẻ",
+  "tv-shows": "TV Shows",
+  "hoat-hinh": "Hoạt hình",
+  "phim-vietsub": "Phim Vietsub",
+  "phim-thuyet-minh": "Phim thuyết minh",
+  "phim-long-tien": "Phim lồng tiếng",
+  "phim-bo-dang-chieu": "Phim bộ đang chiếu",
+  "phim-bo-hoan-thanh": "Phim bộ hoàn thành",
+  "phim-sap-chieu": "Phim sắp chiếu",
+  "subteam": "Subteam",
+};
+
+
 
 export const SORT_FIELD = {
   MODIFIED_TIME: "modified.time",

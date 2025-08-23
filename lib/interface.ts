@@ -145,5 +145,7 @@ export interface PropsMovieHorizontalSlider {
 export interface SectionHeaderProps {
   country?: string;
   link?: string;
+  movieSlug?: string;
   gradient?: string; // ví dụ: "from-purple-400 via-purple-500 to-white"
+  title?: string; // Tiêu đề của phần, nếu cần
 }

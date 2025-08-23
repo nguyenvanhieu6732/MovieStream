@@ -4,8 +4,10 @@ import ScrollRestore from "@/components/scrollEffect/ScrollRestore";
 
 export default function HomePage() {
   return (
-    <ScrollRestore storageKey="home-scroll">
-      <HomePageServer />
-    </ScrollRestore>
+    <>
+      <ScrollRestore storageKey="home-scroll">
+        <HomePageServer />
+      </ScrollRestore>
+    </>
   );
 }

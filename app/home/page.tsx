@@ -1,9 +1,9 @@
-// app/HomePageServer.tsx
 import MovieSlider from "@/components/home/movie-slider";
 import MovieHorizontalSlider from "@/components/home/MovieHorizontalSlider";
 import { OPhimMovie } from "@/lib/interface";
 import { movieEndpoints } from "@/lib/movieEndpoints";
 import * as constants from "@/lib/constants";
+import LazyCarousels from "../../hooks/LazySection";
 
 async function fetchMovies(url: string): Promise<OPhimMovie[]> {
   try {
@@ -18,9 +18,12 @@ async function fetchMovies(url: string): Promise<OPhimMovie[]> {
 }
 
 export default async function HomePageServer() {
-  const results = await Promise.allSettled(
-    movieEndpoints.map(ep => fetchMovies(ep.url))
-  );
+  const results = await Promise.allSettled([
+    fetchMovies(movieEndpoints[0].url),
+    fetchMovies(movieEndpoints[1].url),
+    fetchMovies(movieEndpoints[2].url),
+    fetchMovies(movieEndpoints[3].url),
+  ]);
 
   const latestMovies = results[0].status === "fulfilled" ? results[0].value : [];
   const featuredMovies = latestMovies.slice(0, 5);
@@ -32,9 +35,57 @@ export default async function HomePageServer() {
   return (
     <div className="min-h-screen bg-background">
       <MovieSlider movies={featuredMovies} />
-      <MovieHorizontalSlider gradient={constants.GRADIENTS.PURPLE} movies={hanQuocMovies} />
-      <MovieHorizontalSlider gradient={constants.GRADIENTS.GREEN_TEAL} movies={trungQuocMovies} />
-      <MovieHorizontalSlider gradient={constants.GRADIENTS.PINK_RED} movies={auMyMovies} />
+
+      <MovieHorizontalSlider
+        gradient={constants.GRADIENTS.PURPLE}
+        movies={hanQuocMovies}
+        title={movieEndpoints[1].title}
+        country={movieEndpoints[1].country}
+        movieSlug={movieEndpoints[1].movieSlug}
+      />
+
+      <MovieHorizontalSlider
+        gradient={constants.GRADIENTS.GREEN_TEAL}
+        movies={trungQuocMovies}
+        title={movieEndpoints[2].title}
+        country={movieEndpoints[2].country}
+        movieSlug={movieEndpoints[2].movieSlug}
+      />
+
+      <MovieHorizontalSlider
+        gradient={constants.GRADIENTS.PINK_RED}
+        movies={auMyMovies}
+        title={movieEndpoints[3].title}
+        country={movieEndpoints[3].country}
+        movieSlug={movieEndpoints[3].movieSlug}
+      />
+
+      <LazyCarousels
+        carousels={[
+          {
+            url: movieEndpoints[5].url,
+            title: "Phim lẻ mới nhất",
+            itemsPerRow: 7,
+            showChevron: false,
+            layout: "thumbnail",
+          },
+          {
+            url: movieEndpoints[4].url,
+            title: "Phim bộ mới cóng",
+            itemsPerRow: 5,
+            showChevron: false,
+            layout: "thumbnail",
+          },
+          {
+            url: movieEndpoints[6].url,
+            title: "Phim chiếu rạp mới nhất",
+            itemsPerRow: 3,
+            showChevron: false,
+            layout: "poster"
+
+          },
+        ]}
+      />
     </div>
   );
 }

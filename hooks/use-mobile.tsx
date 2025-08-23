@@ -1,19 +1,31 @@
-import * as React from "react"
+import { useEffect, useState } from "react"
 
-const MOBILE_BREAKPOINT = 768
+const BREAKPOINTS = {
+  mobile: 640,
+  tablet: 1024,
+}
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+type DeviceType = "mobile" | "tablet" | "desktop"
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+export function useDeviceType(): DeviceType | null {
+  const [device, setDevice] = useState<DeviceType | null>(null)
+
+  useEffect(() => {
+    function updateDevice() {
+      const width = window.innerWidth
+      if (width < BREAKPOINTS.mobile) {
+        setDevice("mobile")
+      } else if (width < BREAKPOINTS.tablet) {
+        setDevice("tablet")
+      } else {
+        setDevice("desktop")
+      }
     }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
+
+    updateDevice()
+    window.addEventListener("resize", updateDevice)
+    return () => window.removeEventListener("resize", updateDevice)
   }, [])
 
-  return !!isMobile
+  return device
 }
