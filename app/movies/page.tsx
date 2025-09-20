@@ -33,7 +33,6 @@ export default function MoviesPage({ searchParams }: { searchParams: { country?:
   useEffect(() => {
     setLoading(true);
 
-    // 👇 chỉ scroll top khi đổi trang trong pagination
     if (currentPage > 1) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -47,8 +46,8 @@ export default function MoviesPage({ searchParams }: { searchParams: { country?:
 
   return (
     <ScrollRestore storageKey="movies-scroll" >
-      <div className="min-h-screen p-4">
-        <h1 className="text-2xl font-bold mb-6">
+      <div className="min-h-screen pt-16">
+        <h1 className="text-2xl font-bold mb-6 px-4 mt-4">
           {movieSlug
             ? `${MOVIE_SLUG_LABEL[movieSlug] || movieSlug} mới nhất`
             : country

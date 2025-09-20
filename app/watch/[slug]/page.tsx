@@ -82,7 +82,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 py-6">
-        <div className="text-xl font-semibold mb-4">
+        <div className="text-xl font-semibold mb-4 mt-16">
           Xem phim {movie.name} - Tập {currentEpisodeName}
         </div>
 

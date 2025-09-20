@@ -5,6 +5,7 @@ import Link from "next/link";
 import { memo } from "react";
 import { OPhimMovie } from "@/lib/interface";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { useDeviceType } from "@/hooks/use-mobile";
 
 interface Props {
   movie: OPhimMovie;
@@ -12,9 +13,8 @@ interface Props {
 }
 
 function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
-  // chọn aspect ratio dựa theo variant
   const aspectClass = variant === "thumbnail" ? "aspect-[2/3]" : "aspect-[16/9]";
-
+  const device = useDeviceType();
   return (
     <Link
       href={`/movie/${movie.slug}`}
@@ -35,19 +35,19 @@ function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
           loading="lazy"
         />
         {movie.episode_current && (
-          <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
+          <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded line-clamp-1">
             {movie.episode_current}
           </span>
         )}
         {movie.lang && (
-          <span className="absolute bottom-2 right-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded">
+          <span className="absolute bottom-2 right-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded line-clamp-1">
             {movie.lang}
           </span>
         )}
       </div>
       <div className="p-2">
         <h3 className="text-sm font-semibold line-clamp-1">{movie.name}</h3>
-        <p className="text-xs text-gray-400">{movie.origin_name}</p>
+        <p className="text-xs text-gray-400 line-clamp-1">{movie.origin_name}</p>
       </div>
     </Link>
   );

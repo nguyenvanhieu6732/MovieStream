@@ -28,13 +28,12 @@ export default function MovieHorizontalSlider({
   if (!movies?.length) return null;
 
   const device = useDeviceType()
-  // chuẩn bị items để truyền cho carousel
   const items = movies.map((movie) => (
     <Link
       key={movie._id}
       href={`/movie/${movie.slug}`}
       onClick={handleClick}
-      className="group relative block rounded-md overflow-hidden bg-background transition-all duration-300 hover:shadow-xl"
+      className="group relative block rounded-md overflow-hidden bg-black transition-all duration-300 hover:shadow-xl"
     >
       <div className="relative w-full h-[220px] overflow-hidden">
         <Image
@@ -92,7 +91,7 @@ export default function MovieHorizontalSlider({
             </Link>
           </div>
 
-          <HorizontalCarousel items={items} itemWidth="380px" gap={16} />
+          <HorizontalCarousel items={items} gap={24} itemPerRow={1} />
         </>
       ) : (
         <>
@@ -110,7 +109,7 @@ export default function MovieHorizontalSlider({
               title={title}
             />
 
-            <HorizontalCarousel items={items} itemWidth="380px" gap={24} />
+            <HorizontalCarousel items={items} itemWidth="380px" gap={24} itemPerRow={3} />
           </div>
         </>
       )}

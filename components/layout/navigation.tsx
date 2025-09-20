@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import {
   Search, Menu, X, Sun, Moon, Film, LogOut, User, Heart
@@ -28,6 +27,7 @@ export function Navigation() {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<OPhimMovie[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   const router = useRouter()
   const debouncedQuery = useDebounce(searchQuery, 400)
@@ -44,6 +44,13 @@ export function Navigation() {
     setIsLoggedIn(!!localStorage.getItem("user"))
     router.prefetch("/search")
   }, [router])
+
+  // Theo dõi scroll để đổi màu navbar
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 0)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   // Gợi ý tìm kiếm
   useEffect(() => {
@@ -68,8 +75,6 @@ export function Navigation() {
 
     fetchResults()
   }, [debouncedQuery])
-
-  // ===== HANDLERS =====
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -105,35 +110,35 @@ export function Navigation() {
     { href: "/genre/drama", label: "Thể Loại" },
     { href: "/genre/drama", label: "Phim Lẻ" },
     { href: "/genre/drama", label: "Phim Bộ" },
-    { href: "/search", label: "Quốc Gia" }
+    { href: "/search", label: "Tv-Shows" },
+    { href: "/search", label: "Quốc Gia" },
+    { href: "/search", label: "Bộ Lọc" }
   ]
 
   // ===== RENDER =====
 
   return (
-    <nav className="bg-background border-b sticky top-0 z-50">
-      <div className="mx-4">
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-500 
+        ${scrolled
+          ? "bg-black/90 backdrop-blur-md border-b border-gray-800"
+          : "bg-transparent"
+        }`}
+    >
+      <div className="px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Film className="h-8 w-8 text-red-600" />
             <span className="text-xl font-bold">MovieStream</span>
           </Link>
-
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map(({ href, label }) => (
-              <Link key={href} href={href}>{label}</Link>
-            ))}
-          </div>
-
           {/* Search */}
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md relative mx-8">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Tìm kiếm phim..."
-              className="pl-10"
+              className=" pl-10 bg-gray-800 rounded-xl bg-gray-800/60 border border-gray-700"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={handleFocus}
@@ -143,12 +148,20 @@ export function Navigation() {
               <SearchDropdown results={searchResults} onClose={() => setShowDropdown(false)} />
             )}
           </form>
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center space-x-6">
+            {navLinks.map(({ href, label }) => (
+              <Link key={href} href={href}>{label}</Link>
+            ))}
+          </div>
+
+
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden md:flex">
+            {/* <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden md:flex">
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
+            </Button> */}
 
             {isLoggedIn ? (
               <DropdownMenu>

@@ -6,7 +6,7 @@ import ScrollToTopButton from "../scrollEffect/ScrollToTopButton"
 
 export default function Footer() {
     return (
-        <footer className="bg-[#0B0C10] text-gray-300 pt-12 pb-6 mt-4 relative border-t border-gray-700">
+        <footer className="bg-black text-gray-300 pt-12 pb-6 relative border-t border-black-700">
             <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
                 {/* Logo + Slogan */}
                 <div>

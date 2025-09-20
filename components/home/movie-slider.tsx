@@ -38,13 +38,12 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
     return () => clearInterval(interval);
   }, [emblaApi]);
 
-  // 🚨 Nếu chưa mounted, return null để tránh hydration mismatch
   if (!mounted) {
     return null;
   }
 
   return (
-    <section className="relative aspect-[16/9] md:h-[80vh] w-full overflow-hidden">
+    <section className="relative aspect-[16/9] md:h-[100vh] w-full overflow-hidden">
       <div className="overflow-hidden h-full" ref={emblaRef}>
         <div className="flex h-full">
           {movies.map((movie, index) => (
@@ -52,7 +51,6 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
               key={movie._id}
               className="min-w-full relative h-full flex-shrink-0"
             >
-              {/* ✅ Bây giờ không bị mismatch nữa vì chỉ render khi mounted */}
               <Link href={device === "mobile" ? `/movie/${movie.slug}` : "#"}>
                 <Image
                   src={getImageUrl(movie.poster_url)}
@@ -64,7 +62,10 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                   loading={index === 0 ? "eager" : "lazy"}
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
+                <div className="absolute inset-0 z-10">
+                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/40 to-transparent" />
+                </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-16 z-20">
                   <div className="max-w-md sm:max-w-xl md:max-w-3xl space-y-2 sm:space-y-3 md:space-y-5">
@@ -144,8 +145,8 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
               key={i}
               onClick={() => emblaApi?.scrollTo(i)}
               className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${selectedIndex === i
-                  ? "bg-white scale-110"
-                  : "bg-white/40 hover:bg-white/70"
+                ? "bg-white scale-110"
+                : "bg-white/40 hover:bg-white/70"
                 }`}
               aria-label={`Go to slide ${i + 1}`}
             />

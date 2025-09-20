@@ -28,6 +28,10 @@ export const MOVIE_SLUG_LABEL: Record<string, string> = {
   "phim-bo-hoan-thanh": "Phim bộ hoàn thành",
   "phim-sap-chieu": "Phim sắp chiếu",
   "subteam": "Subteam",
+  "phim-chieu-rap": "Phim chiếu rạp",
+  "phim-thai-lan": "Phim Thái Lan",
+  "phim-nhat-ban": "Phim Nhật Bản",
+  "phim-sap-chieu": "Phim Sắp Chiếu"
 };
 
 

@@ -5,13 +5,16 @@ import { useInView } from "react-intersection-observer";
 import MovieCarousel from "@/components/scrollEffect/MovieCarousel";
 import { OPhimMovie } from "@/lib/interface";
 import { LoadingEffect } from "@/components/effect/loading-effect";
+import { useDeviceType } from "./use-mobile";
 
 interface CarouselConfig {
   url: string;
   title: string;
-  itemsPerRow: number;
+  itemsPerRow: number | { device: number };
   showChevron?: boolean;
   layout?: "thumbnail" | "poster";
+  seeAllLink?: string;
+  itemPerRowMobile?: number;
 }
 
 export default function LazyCarousels({ carousels }: { carousels: CarouselConfig[] }) {
@@ -40,6 +43,7 @@ export default function LazyCarousels({ carousels }: { carousels: CarouselConfig
         .finally(() => setLoading(false));
     }
   }, [inView, carousels, moviesData, loading]);
+  const device = useDeviceType();
 
   return (
     <div ref={ref} className="my-10 space-y-10">
@@ -51,8 +55,17 @@ export default function LazyCarousels({ carousels }: { carousels: CarouselConfig
             movies={moviesData[c.title]}
             title={c.title}
             layout={c.layout}
-            itemsPerRow={c.itemsPerRow}
+            itemsPerRow={
+              device === "mobile"
+                ? c.itemPerRowMobile ?? (typeof c.itemsPerRow === "number" ? c.itemsPerRow : undefined)
+                : typeof c.itemsPerRow === "number"
+                  ? c.itemsPerRow
+                  : typeof c.itemsPerRow === "object" && "device" in c.itemsPerRow
+                    ? c.itemsPerRow.device
+                    : undefined
+            }
             showChevron={c.showChevron}
+            seeAllLink={c.seeAllLink}
           />
         ) : null
       )}

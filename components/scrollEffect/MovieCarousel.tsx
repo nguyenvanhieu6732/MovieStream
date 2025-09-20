@@ -37,7 +37,6 @@ export default function MovieCarousel({
     emblaApi?.scrollNext();
   }, [emblaApi]);
 
-  // gap mặc định là 1rem (16px) vì bạn đang dùng gap-4
   const gap = 16;
   const itemWidth = `calc((100% - ${(itemsPerRow - 1) * gap}px) / ${itemsPerRow})`;
 
@@ -45,7 +44,7 @@ export default function MovieCarousel({
     <div className="relative mx-auto px-2 py-4">
       {title && (
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">{title}</h2>
+          <h2 className="text-2xl">{title}</h2>
 
           {seeAllLink && (
             <Link

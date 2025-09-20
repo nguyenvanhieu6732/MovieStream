@@ -33,7 +33,7 @@ export default async function HomePageServer() {
   const auMyMovies = results[3].status === "fulfilled" ? results[3].value : [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black">
       <MovieSlider movies={featuredMovies} />
 
       <MovieHorizontalSlider
@@ -66,23 +66,61 @@ export default async function HomePageServer() {
             url: movieEndpoints[5].url,
             title: "Phim lẻ mới nhất",
             itemsPerRow: 7,
+            itemPerRowMobile: 3,  
             showChevron: false,
             layout: "thumbnail",
+            seeAllLink: movieEndpoints[5].seeAllLink
           },
           {
             url: movieEndpoints[4].url,
             title: "Phim bộ mới cóng",
             itemsPerRow: 5,
             showChevron: false,
+            itemPerRowMobile: 2,
             layout: "thumbnail",
+            seeAllLink: movieEndpoints[4].seeAllLink
           },
           {
             url: movieEndpoints[6].url,
             title: "Phim chiếu rạp mới nhất",
             itemsPerRow: 3,
+            itemPerRowMobile: 2,
             showChevron: false,
-            layout: "poster"
+            layout: "poster",
+            seeAllLink: movieEndpoints[6].seeAllLink
 
+          },
+        ]}
+      />
+
+      <LazyCarousels
+        carousels={[
+          {
+            url: movieEndpoints[7].url,
+            title: "Phim Nhật Bản mới Oanh Tạc Chốn Này",
+            itemsPerRow: 7,
+            itemPerRowMobile: 2,
+            showChevron: false,
+            layout: "thumbnail",
+            seeAllLink: movieEndpoints[7].seeAllLink
+          },
+          {
+            url: movieEndpoints[8].url,
+            title: "Phim Thái New: Không Drama Đời Không Nể",
+            itemsPerRow: 5,
+            itemPerRowMobile: 2,
+            showChevron: false,
+            layout: "thumbnail",
+            seeAllLink: movieEndpoints[8].seeAllLink
+          },
+          {
+            url: movieEndpoints[9].url,
+            title: "Phim Sắp Tới Trên MovieStream",
+            itemsPerRow: 3,
+            itemPerRowMobile: 2,
+            showChevron: false,
+            layout: "poster",
+            seeAllLink: movieEndpoints[9].seeAllLink
           },
         ]}
       />

@@ -31,7 +31,7 @@ interface Episode {
 
 // ErrorBoundary Fallback
 const FallbackComponent = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
+  <div className="min-h-screen bg-black flex items-center justify-center">
     <Card className="p-6">
       <p className="text-red-600">Có lỗi xảy ra: {error.message}</p>
       <Button onClick={resetErrorBoundary} className="mt-4">
@@ -106,7 +106,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <Card className="p-6">
           <p className="text-red-600">{error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
@@ -121,7 +121,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
 
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-black">
         {/* SEO Metadata */}
         <Head>
           <title>{movie.name} - Xem phim online</title>
@@ -143,7 +143,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
             blurDataURL="/low-res-poster.jpg"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
 
         <div className="container mx-auto px-4 -mt-32 relative z-10">
