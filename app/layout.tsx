@@ -5,7 +5,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import Footer from "@/components/layout/footer"
 import { Navigation } from "@/components/layout/navigation"
-import SplashProvider from "@/components/effect/SplashProvider" 
+import SplashProvider from "@/components/effect/SplashProvider"
+import AuthProvider from "@/providers/session-provider" // ✅ import wrapper
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -28,11 +29,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <SplashProvider> 
-            <Navigation />
-            {children}
-            <Footer />
-          </SplashProvider>
+          <AuthProvider> {/* ✅ dùng wrapper thay cho SessionProvider trực tiếp */}
+            <SplashProvider> 
+              <Navigation />
+              {children}
+              <Footer />
+            </SplashProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

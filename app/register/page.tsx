@@ -31,21 +31,21 @@ export default function RegisterPage() {
 
     // Basic validation
     if (!name || !email || !password || !confirmPassword) {
-      setMessage("Please fill in all fields")
+      setMessage("Hay điền vào tất cả các trường")
       setMessageType("error")
       setIsLoading(false)
       return
     }
 
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match")
+      setMessage("Mật khẩu không khớp")
       setMessageType("error")
       setIsLoading(false)
       return
     }
 
     if (password.length < 6) {
-      setMessage("Password must be at least 6 characters long")
+      setMessage("Mật khẩu phải có ít nhất 6 ký tự")
       setMessageType("error")
       setIsLoading(false)
       return
@@ -79,17 +79,17 @@ export default function RegisterPage() {
             <Film className="h-8 w-8 text-red-600 mr-2" />
             <span className="text-2xl font-bold">MovieStream</span>
           </div>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>Join MovieStream to start watching amazing content</CardDescription>
+          <CardTitle className="text-2xl">Tạo Tài Khoản</CardTitle>
+          <CardDescription>Tham gia MovieStream để bắt đầu xem nội dung tuyệt vời</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Họ Tên</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="Nhập họ tên của bạn"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -101,7 +101,7 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Nhập email của bạn"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
+                  placeholder="Nhập mật khẩu của bạn"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -132,12 +132,12 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Xác Nhận Mật Khẩu</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
+                  placeholder="Xác nhận mật khẩu của bạn"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -163,22 +163,22 @@ export default function RegisterPage() {
             )}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isLoading ? "Đang tạo tài khoản..." : "Tạo Tài Khoản"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
+              Đã có tài khoản?{" "}
               <Link href="/login" className="text-red-600 hover:underline">
-                Sign in
+                Đăng Nhập
               </Link>
             </p>
           </div>
 
           <div className="mt-4 text-center">
             <Link href="/" className="text-sm text-muted-foreground hover:underline">
-              Back to Home
+              Quay Về Trang Chủ
             </Link>
           </div>
         </CardContent>

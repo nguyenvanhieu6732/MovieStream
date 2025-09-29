@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Film } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"   // 🔑 Import NextAuth
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -26,29 +26,23 @@ export default function LoginPage() {
     setIsLoading(true)
     setMessage("")
 
-    // Simulate API call
-    setTimeout(() => {
-      if (email && password) {
-        // Mock successful login
-        const user = {
-          id: 1,
-          name: "John Doe",
-          email: email,
-          avatar: "/placeholder.svg?height=40&width=40",
-        }
-        localStorage.setItem("user", JSON.stringify(user))
-        setMessage("Login successful! Redirecting...")
-        setMessageType("success")
+    // Nếu muốn dùng NextAuth credentials thì thay đổi ở đây
+    if (email && password) {
+      setMessage("Mock login thành công (chưa kết nối DB)")
+      setMessageType("success")
+      setTimeout(() => {
+        router.push("/")
+      }, 1000)
+    } else {
+      setMessage("Please fill in all fields")
+      setMessageType("error")
+    }
+    setIsLoading(false)
+  }
 
-        setTimeout(() => {
-          router.push("/")
-        }, 1000)
-      } else {
-        setMessage("Please fill in all fields")
-        setMessageType("error")
-      }
-      setIsLoading(false)
-    }, 1000)
+  // 🔑 Hàm login bằng Google (NextAuth)
+  const handleGoogleLogin = async () => {
+    await signIn("google", { callbackUrl: "/" })
   }
 
   return (
@@ -59,8 +53,8 @@ export default function LoginPage() {
             <Film className="h-8 w-8 text-red-600 mr-2" />
             <span className="text-2xl font-bold">MovieStream</span>
           </div>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
-          <CardDescription>Sign in to your account to continue watching</CardDescription>
+          <CardTitle className="text-2xl">Chào Mừng Trở Lại</CardTitle>
+          <CardDescription>Đăng nhập vào tài khoản của bạn để tiếp tục xem</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +63,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Nhập email của bạn"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -82,7 +76,7 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="Nhập mật khẩu của bạn"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -108,13 +102,20 @@ export default function LoginPage() {
             )}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? "Đang đăng nhập..." : "Đăng Nhập"}
             </Button>
           </form>
 
+          {/* 🔑 Thêm nút login Google */}
+          <div className="mt-4">
+            <Button onClick={handleGoogleLogin} variant="outline" className="w-full">
+              Đăng Nhập Bằng Google
+            </Button>
+          </div>
+
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              Chưa có tài khoản?{" "}
               <Link href="/register" className="text-red-600 hover:underline">
                 Đăng Ký
               </Link>
@@ -123,7 +124,7 @@ export default function LoginPage() {
 
           <div className="mt-4 text-center">
             <Link href="/" className="text-sm text-muted-foreground hover:underline">
-              Back to Home
+              Quay Về Trang Chủ
             </Link>
           </div>
         </CardContent>

@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Search, Menu, X, Sun, Moon, Film, LogOut, User, Heart
+  Search, Menu, X, Film, LogOut, User, Heart
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,11 +19,10 @@ import {
 import { useDebounce } from "@/hooks/useDebounce"
 import { OPhimMovie } from "@/lib/interface"
 import { SearchDropdown } from "../home/SearchDropdown"
+import { useSession, signOut } from "next-auth/react"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<OPhimMovie[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
@@ -32,27 +31,14 @@ export function Navigation() {
   const router = useRouter()
   const debouncedQuery = useDebounce(searchQuery, 400)
 
-  // Prefetch và setup theme, login
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme")
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-    const currentTheme = savedTheme || (prefersDark ? "dark" : "light")
-    document.documentElement.classList.toggle("dark", currentTheme === "dark")
-    setIsDarkMode(currentTheme === "dark")
-    localStorage.setItem("theme", currentTheme)
+  const { data: session } = useSession()
 
-    setIsLoggedIn(!!localStorage.getItem("user"))
-    router.prefetch("/search")
-  }, [router])
-
-  // Theo dõi scroll để đổi màu navbar
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 0)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Gợi ý tìm kiếm
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setSearchResults([])
@@ -93,52 +79,37 @@ export function Navigation() {
     if (searchResults.length > 0) setShowDropdown(true)
   }
 
-  const toggleTheme = () => {
-    const newTheme = isDarkMode ? "light" : "dark"
-    document.documentElement.classList.toggle("dark", newTheme === "dark")
-    localStorage.setItem("theme", newTheme)
-    setIsDarkMode(newTheme === "dark")
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    setIsLoggedIn(false)
-    router.push("/")
-  }
-
   const navLinks = [
     { href: "/genre/drama", label: "Thể Loại" },
-    { href: "/genre/drama", label: "Phim Lẻ" },
-    { href: "/genre/drama", label: "Phim Bộ" },
-    { href: "/search", label: "Tv-Shows" },
+    { href: "/movies?movieSlug=phim-le", label: "Phim Lẻ" },
+    { href: "/movies?movieSlug=phim-bo", label: "Phim Bộ" },
     { href: "/search", label: "Quốc Gia" },
     { href: "/search", label: "Bộ Lọc" }
   ]
 
-  // ===== RENDER =====
-
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-500 
+      className={`fixed top-0 left-0 w-full z-[1000] transition-colors duration-500 min-h-[64px]
         ${scrolled
           ? "bg-black/90 backdrop-blur-md border-b border-gray-800"
           : "bg-transparent"
         }`}
     >
-      <div className="px-4">
+      <div className="nav-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Film className="h-8 w-8 text-red-600" />
             <span className="text-xl font-bold">MovieStream</span>
           </Link>
+
           {/* Search */}
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md relative mx-8">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Tìm kiếm phim..."
-              className=" pl-10 bg-gray-800 rounded-xl bg-gray-800/60 border border-gray-700"
+              className="pl-10 bg-gray-800 rounded-xl bg-gray-800/60 border border-gray-700"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={handleFocus}
@@ -148,6 +119,7 @@ export function Navigation() {
               <SearchDropdown results={searchResults} onClose={() => setShowDropdown(false)} />
             )}
           </form>
+
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-6">
             {navLinks.map(({ href, label }) => (
@@ -155,45 +127,39 @@ export function Navigation() {
             ))}
           </div>
 
-
-
           {/* Actions */}
-          <div className="flex items-center space-x-2">
-            {/* <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden md:flex">
-              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button> */}
-
-            {isLoggedIn ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                  </Button>
+          <div className="flex items-center nav-actions">
+            {session?.user ? (
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild className="dropdown-menu-trigger">
+                  <Avatar className="h-9 w-9 mx-4 cursor-pointer avatar flex items-center justify-center">
+                    <AvatarImage src={session?.user?.image ?? "/placeholder.svg"} />
+                    <AvatarFallback>
+                      {session?.user?.name?.charAt(0) ?? "U"}
+                    </AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" sideOffset={8} alignOffset={-4} className="dropdown-menu-content">
                   <DropdownMenuItem asChild>
                     <Link href="/profile"><User className="mr-2 h-4 w-4" /> Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/watchlist"><Heart className="mr-2 h-4 w-4" /> Watchlist</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="hidden md:flex items-center space-x-2">
+              <div className="hidden md:flex items-center space-x-2 mr-4">
                 <Link href="/login"><Button variant="ghost">Đăng Nhập</Button></Link>
                 <Link href="/register"><Button>Đăng Ký</Button></Link>
               </div>
             )}
 
             {/* Mobile menu toggle */}
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(prev => !prev)}>
+            <Button variant="ghost" size="icon" className="md:hidden mobile-menu-toggle" onClick={() => setIsMenuOpen(prev => !prev)}>
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -207,15 +173,15 @@ export function Navigation() {
                 {label}
               </Link>
             ))}
-            {isLoggedIn ? (
+            {session?.user ? (
               <>
                 <Link href="/profile"><Button variant="ghost" className="w-full">Profile</Button></Link>
                 <Link href="/watchlist"><Button variant="ghost" className="w-full">Watchlist</Button></Link>
-                <Button onClick={handleLogout} className="w-full" variant="destructive">Đăng Xuất</Button>
+                <Button onClick={() => signOut()} className="w-full" variant="destructive">Đăng Xuất</Button>
               </>
             ) : (
               <>
-                <Link href="/login"><Button variant="ghost" className="w-full">Đăng Nhập</Button></Link>
+                <Link href="/auth/signin"><Button variant="ghost" className="w-full">Đăng Nhập</Button></Link>
                 <Link href="/register"><Button className="w-full">Đăng Ký</Button></Link>
               </>
             )}

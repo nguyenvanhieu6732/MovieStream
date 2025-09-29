@@ -69,7 +69,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">
+        <h1 className="text-3xl font-bold mb-6 mt-12">
           {searchQuery ? `Kết quả cho "${searchQuery}"` : "Tìm kiếm phim"}
         </h1>
 
