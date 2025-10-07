@@ -45,6 +45,11 @@ export default function LoginPage() {
     await signIn("google", { callbackUrl: "/" })
   }
 
+  // 🔑 Hàm login bằng Facebook (NextAuth)
+  const handleFacebookLogin = async () => {
+    await signIn("facebook", { callbackUrl: "/" })
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -88,7 +93,11 @@ export default function LoginPage() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -110,6 +119,11 @@ export default function LoginPage() {
           <div className="mt-4">
             <Button onClick={handleGoogleLogin} variant="outline" className="w-full">
               Đăng Nhập Bằng Google
+            </Button>
+          </div>
+          <div className="mt-4">
+            <Button onClick={handleFacebookLogin} variant="outline" className="w-full">
+              Đăng Nhập Bằng FaceBook
             </Button>
           </div>
 
