@@ -11,6 +11,11 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID!,
@@ -19,14 +24,21 @@ const handler = NextAuth({
   ],
 
   session: {
-    strategy: "database", // đúng, dùng DB lưu session
+    strategy: "database",
   },
 
   pages: {
-    signIn: "/auth/signin", // ⚠️ Cần có dấu "/" ở đầu
+    signIn: "/",  
+    error: "/",   
   },
 
-  secret: process.env.NEXTAUTH_SECRET, // ✅ rất quan trọng, nhiều bạn hay quên
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      return baseUrl;    
+    },
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
 })
 
 export { handler as GET, handler as POST }
