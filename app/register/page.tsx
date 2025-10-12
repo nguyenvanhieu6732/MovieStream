@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Film } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
@@ -29,10 +28,10 @@ export default function RegisterPage() {
     setIsLoading(true)
     setMessage("")
 
-    // Basic validation
     if (!name || !email || !password || !confirmPassword) {
-      setMessage("Hay điền vào tất cả các trường")
+      setMessage("Hãy điền vào tất cả các trường")
       setMessageType("error")
+      toast.error("Hãy điền vào tất cả các trường")
       setIsLoading(false)
       return
     }
@@ -40,6 +39,7 @@ export default function RegisterPage() {
     if (password !== confirmPassword) {
       setMessage("Mật khẩu không khớp")
       setMessageType("error")
+      toast.error("Mật khẩu không khớp")
       setIsLoading(false)
       return
     }
@@ -47,28 +47,40 @@ export default function RegisterPage() {
     if (password.length < 6) {
       setMessage("Mật khẩu phải có ít nhất 6 ký tự")
       setMessageType("error")
+      toast.error("Mật khẩu phải có ít nhất 6 ký tự")
       setIsLoading(false)
       return
     }
 
-    // Simulate API call
-    setTimeout(() => {
-      // Mock successful registration
-      const user = {
-        id: 1,
-        name: name,
-        email: email,
-        avatar: "/placeholder.svg?height=40&width=40",
-      }
-      localStorage.setItem("user", JSON.stringify(user))
-      setMessage("Registration successful! Redirecting...")
-      setMessageType("success")
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      })
 
-      setTimeout(() => {
-        router.push("/")
-      }, 1000)
+      const data = await res.json()
+
+      if (!res.ok) {
+        setMessage(data.message || "Đăng ký thất bại")
+        setMessageType("error")
+        toast.error(data.message || "Đăng ký thất bại")
+      } else {
+        setMessage("Tạo tài khoản thành công! Đang chuyển hướng...")
+        setMessageType("success")
+        toast.success("Tạo tài khoản thành công! Đang chuyển hướng...")
+
+        setTimeout(() => {
+          router.push("/login")
+        }, 1500)
+      }
+    } catch (error) {
+      setMessage("Lỗi kết nối server")
+      setMessageType("error")
+      toast.error("Lỗi kết nối server")
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -92,7 +104,6 @@ export default function RegisterPage() {
                 placeholder="Nhập họ tên của bạn"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required
               />
             </div>
 
@@ -104,7 +115,6 @@ export default function RegisterPage() {
                 placeholder="Nhập email của bạn"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
             </div>
 
@@ -117,7 +127,6 @@ export default function RegisterPage() {
                   placeholder="Nhập mật khẩu của bạn"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                 />
                 <Button
                   type="button"
@@ -140,7 +149,6 @@ export default function RegisterPage() {
                   placeholder="Xác nhận mật khẩu của bạn"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
                 />
                 <Button
                   type="button"
@@ -154,13 +162,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {message && (
-              <Alert className={messageType === "error" ? "border-red-500" : "border-green-500"}>
-                <AlertDescription className={messageType === "error" ? "text-red-700" : "text-green-700"}>
-                  {message}
-                </AlertDescription>
-              </Alert>
-            )}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Đang tạo tài khoản..." : "Tạo Tài Khoản"}

@@ -1,83 +1,80 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Play, Star } from "lucide-react"
-import extractTextFromHtml from "@/lib/extractTextFromHtml"
-import CommentSection from "@/components/detailMovie/comment-section"
-import Link from "next/link"
-import Image from "next/image"
-import { useSearchParams } from "next/navigation"
-import { getImageUrl } from "@/lib/getImageUrl"
-import { LoadingEffect } from "@/components/effect/loading-effect"
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Play, Star } from "lucide-react";
+import extractTextFromHtml from "@/lib/extractTextFromHtml";
+import CommentSection from "@/components/detailMovie/comment-section";
+import Link from "next/link";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { getImageUrl } from "@/lib/getImageUrl";
+import { LoadingEffect } from "@/components/effect/loading-effect";
 
 export default function WatchPage({ params }: { params: { slug: string } }) {
-  const { slug } = useParams()
-  const [movie, setMovie] = useState<any>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [showFullDescription, setShowFullDescription] = useState(false)
-  const [isLongDescription, setIsLongDescription] = useState(false)
-  const [relatedMovies, setRelatedMovies] = useState<any[]>([])
-  const searchParams = useSearchParams()
-  const epFromQuery = searchParams.get("ep")
+  const { slug } = useParams();
+  const [movie, setMovie] = useState<any>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isLongDescription, setIsLongDescription] = useState(false);
+  const [relatedMovies, setRelatedMovies] = useState<any[]>([]);
+  const searchParams = useSearchParams();
+  const epFromQuery = searchParams.get("ep");
 
-  const defaultEpisode = epFromQuery ? parseInt(epFromQuery) : 0
-  const [selectedEpisode, setSelectedEpisode] = useState(defaultEpisode)
+  const defaultEpisode = epFromQuery ? parseInt(epFromQuery) : 0;
+  const [selectedEpisode, setSelectedEpisode] = useState(defaultEpisode);
+
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const res = await fetch(`https://ophim1.com/phim/${slug}`)
-        const json = await res.json()
+        const res = await fetch(`https://ophim1.com/phim/${slug}`);
+        const json = await res.json();
+        // Lưu ý: Dữ liệu từ API không khớp trực tiếp với schema Post, chỉ dùng slug để tìm Post
         setMovie({
           ...json.movie,
-          episodes: json.episodes
-        })
+          episodes: json.episodes,
+        });
 
-        const plainText = extractTextFromHtml(json.movie.content || "")
-        const lineCount = plainText.split("\n").length
-        setIsLongDescription(lineCount > 4 || plainText.length > 300)
+        const plainText = extractTextFromHtml(json.movie.content || "");
+        const lineCount = plainText.split("\n").length;
+        setIsLongDescription(lineCount > 4 || plainText.length > 300);
 
-        // fetch phim liên quan
-        const firstCategorySlug = json.movie.category?.[0]?.slug
+        // Fetch phim liên quan
+        const firstCategorySlug = json.movie.category?.[0]?.slug;
         if (firstCategorySlug) {
-          const relatedRes = await fetch(`https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=1`)
-          const relatedJson = await relatedRes.json()
-          const suggestions = relatedJson.items.filter((m: any) => m.slug !== slug).slice(0, 4)
-          setRelatedMovies(suggestions)
+          const relatedRes = await fetch(`https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=1`);
+          const relatedJson = await relatedRes.json();
+          const suggestions = relatedJson.items.filter((m: any) => m.slug !== slug).slice(0, 4);
+          setRelatedMovies(suggestions);
         }
       } catch (err) {
-        console.error("Lỗi khi tải phim:", err)
+        console.error("Lỗi khi tải phim:", err);
       }
-    }
+    };
 
-    fetchMovie()
-    document.documentElement.classList.add("dark")
-  }, [slug])
+    fetchMovie();
+    document.documentElement.classList.add("dark");
+  }, [slug]);
 
   useEffect(() => {
-    setIsPlaying(false)
-  }, [selectedEpisode])
+    setIsPlaying(false);
+  }, [selectedEpisode]);
 
   if (!movie) {
-    return (
-      <LoadingEffect message="Đang tải thông tin phim..." />
-    )
+    return <LoadingEffect message="Đang tải thông tin phim..." />;
   }
 
-  const episodeList = movie.episodes?.[0]?.server_data || []
-  const currentEpisode = episodeList[selectedEpisode]
+  const episodeList = movie.episodes?.[0]?.server_data || [];
+  const currentEpisode = episodeList[selectedEpisode];
   const currentEpisodeName =
     currentEpisode?.filename?.trim() === ""
       ? "1"
-      : currentEpisode?.name || "1"
+      : currentEpisode?.name || "1";
 
-  const descriptionText = extractTextFromHtml(movie.content)
-
-
-
+  const descriptionText = extractTextFromHtml(movie.content);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -133,7 +130,6 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
             )}
           </div>
         </Card>
-
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main content */}
@@ -202,8 +198,8 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                   <h3 className="text-xl font-semibold mb-4">Danh sách tập</h3>
                   <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                     {episodeList.map((ep: any, index: number) => {
-                      const episodeName = ep.name?.trim() || `Tập ${index + 1}`
-                      const isSelected = selectedEpisode === index
+                      const episodeName = ep.name?.trim() || `Tập ${index + 1}`;
+                      const isSelected = selectedEpisode === index;
                       return (
                         <Button
                           key={index}
@@ -213,14 +209,14 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                         >
                           {episodeName}
                         </Button>
-                      )
+                      );
                     })}
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            <CommentSection slug={params.slug} />
+            <CommentSection slug={Array.isArray(slug) ? slug[0] : slug} /> {/* Đảm bảo slug là string */}
           </div>
 
           {/* Sidebar: Gợi ý phim */}
@@ -260,5 +256,5 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

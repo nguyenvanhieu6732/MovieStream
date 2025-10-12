@@ -132,7 +132,7 @@ export function Navigation() {
             {session?.user ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild className="dropdown-menu-trigger">
-                  <Avatar className="h-9 w-9 mx-4 cursor-pointer avatar flex items-center justify-center">
+                  <Avatar className="h-10 w-10 mx-4 cursor-pointer avatar flex items-center justify-center">
                     <AvatarImage src={session?.user?.image ?? "/placeholder.svg"} />
                     <AvatarFallback>
                       {session?.user?.name?.charAt(0) ?? "U"}
@@ -146,7 +146,7 @@ export function Navigation() {
                   <DropdownMenuItem asChild>
                     <Link href="/watchlist"><Heart className="mr-2 h-4 w-4" /> Watchlist</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => signOut()}>
+                  <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>

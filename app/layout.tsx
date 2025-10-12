@@ -6,7 +6,8 @@ import { ThemeProvider } from "@/components/layout/theme-provider"
 import Footer from "@/components/layout/footer"
 import { Navigation } from "@/components/layout/navigation"
 import SplashProvider from "@/components/effect/SplashProvider"
-import AuthProvider from "@/providers/session-provider" // ✅ import wrapper
+import AuthProvider from "@/providers/session-provider"
+import { Toaster } from "sonner"  // ✅ Thêm
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,11 +30,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <AuthProvider> {/* ✅ dùng wrapper thay cho SessionProvider trực tiếp */}
-            <SplashProvider> 
+          <AuthProvider>
+            <SplashProvider>
               <Navigation />
               {children}
               <Footer />
+              <Toaster richColors position="top-center" />
             </SplashProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -1,24 +1,11 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { withAuth } from "next-auth/middleware";
 
-export function middleware(request: NextRequest) {
-  // Check if user is accessing protected routes
-  const protectedPaths = ["/profile"]
-  const isProtectedPath = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path))
-
-  if (isProtectedPath) {
-    // Check for user token in cookies
-    const userToken = request.cookies.get("user-token")
-
-    if (!userToken) {
-      // Redirect to login if not authenticated
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-  }
-
-  return NextResponse.next()
-}
+export default withAuth({
+  pages: {
+    signIn: "/login", // nếu chưa đăng nhập -> redirect về /login
+  },
+});
 
 export const config = {
-  matcher: ["/profile/:path*", "/watch/:path*"],
-}
+  matcher: ["/profile/:path*", "/watchlist/:path*"],
+};

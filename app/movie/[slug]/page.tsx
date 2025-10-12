@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Navigation } from "@/components/layout/navigation";
-import { Calendar, Clock, Heart, Play, Share2, Star } from "lucide-react";
+import { Calendar, Clock, Play, Share2, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import Head from "next/head";
@@ -14,34 +13,31 @@ import { ErrorBoundary } from "react-error-boundary";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import { LoadingEffect } from "@/components/effect/loading-effect";
 import { MovieItem } from "@/lib/interface";
+import AddToWatchlistButton from "@/components/button/AddToWatchlistButton";
+import { getImageUrl } from "@/lib/getImageUrl";
+import { prisma } from "@/lib/prisma"; // Thêm import prisma
 
-// Lazy load CommentSection
 const CommentSection = dynamic(() => import("@/components/detailMovie/comment-section"), {
   loading: () => <LoadingEffect />,
   ssr: false,
 });
-
-// Types for better type safety
-
 
 interface Episode {
   name?: string;
   link_embed: string;
 }
 
-// ErrorBoundary Fallback
 const FallbackComponent = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
   <div className="min-h-screen bg-black flex items-center justify-center">
     <Card className="p-6">
       <p className="text-red-600">Có lỗi xảy ra: {error.message}</p>
-      <Button onClick={resetErrorBoundary} className="mt-4">
-        Thử lại
-      </Button>
+      <Button onClick={resetErrorBoundary} className="mt-4">Thử lại</Button>
     </Card>
   </div>
 );
 
 export default function MovieDetailPage({ params }: { params: { slug: string } }) {
+  const slug = params.slug;
   const [movie, setMovie] = useState<MovieItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [selectedEpisode, setSelectedEpisode] = useState(0);
@@ -50,68 +46,93 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isLongDescription, setIsLongDescription] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [watchlist, setWatchlist] = useState<string[]>(() => JSON.parse(localStorage.getItem("watchlist") || "[]"));
 
-  // Memoized description text
   const descriptionText = useMemo(() => extractTextFromHtml(movie?.content || ""), [movie]);
 
-  // Fetch movie data with AbortController
+  // Fetch movie details and create post if not exists
   useEffect(() => {
     const controller = new AbortController();
     const fetchMovie = async () => {
       try {
         setError(null);
-        const res = await fetch(`https://ophim1.com/phim/${params.slug}`, {
+        const API_URL = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
+        const res = await fetch(`${API_URL}/phim/${encodeURIComponent(slug)}`, {
           signal: controller.signal,
         });
-        if (!res.ok) throw new Error("Failed to fetch movie data");
+        if (!res.ok) {
+          if (res.status === 404) {
+            setError("Không tìm thấy phim với slug này.");
+          } else {
+            throw new Error(`Failed to fetch movie data (${res.status})`);
+          }
+        }
         const data = await res.json();
-        setMovie(data.movie);
-        setEpisodes(data.episodes[0]?.server_data || []);
-        const plainText = extractTextFromHtml(data.movie.content || "");
+        const item = data?.data?.item;
+        if (!item) throw new Error("Invalid movie data");
+        setMovie(item as MovieItem);
+        const eps: Episode[] = item.episodes?.[0]?.server_data || (Array.isArray(item.server_data) ? item.server_data : []);
+        setEpisodes(eps);
+        const plainText = extractTextFromHtml(item.content || "");
         setIsLongDescription(plainText.split("\n").length > 4 || plainText.length > 300);
-      } catch (error) {
-        if (typeof error === "object" && error !== null && "name" in error && (error as any).name === "AbortError") return;
+
+        // Create post if not exists
+        const post = await fetch(`/api/posts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: item.slug,
+            title: item.name,
+            content: plainText,
+          }),
+        });
+        if (!post.ok) {
+          console.error("Failed to create post:", await post.json());
+        }
+      } catch (err: any) {
+        if (err?.name === "AbortError") return;
+        console.error("Error fetching movie:", err);
         setError("Không thể tải dữ liệu phim. Vui lòng thử lại.");
-        console.error("Error fetching movie:", error);
       }
     };
-
     fetchMovie();
     return () => controller.abort();
-  }, [params.slug]);
+  }, [slug]);
 
-  // Check watchlist status
+  // Check saved status from DB via API
   useEffect(() => {
-    setIsInWatchlist(watchlist.includes(params.slug));
-  }, [watchlist, params.slug]);
+    let mounted = true;
+    const checkSaved = async () => {
+      try {
+        const res = await fetch(`/api/watchlist?movieId=${encodeURIComponent(slug)}`, {
+          credentials: "include",
+        });
+        if (!mounted) return;
+        if (!res.ok) {
+          if (res.status === 401) {
+            setIsInWatchlist(false);
+            return;
+          }
+          console.error("Check watchlist failed", res.status);
+          return;
+        }
+        const data = await res.json();
+        setIsInWatchlist(Boolean(data.isSaved));
+      } catch (err) {
+        console.error("Error checking watchlist:", err);
+      }
+    };
+    checkSaved();
+    return () => { mounted = false; };
+  }, [slug]);
 
-  // Toggle watchlist
-  const toggleWatchlist = useCallback(() => {
-    const newList = isInWatchlist
-      ? watchlist.filter((slug: string) => slug !== params.slug)
-      : [...watchlist, params.slug];
-    setWatchlist(newList);
-    localStorage.setItem("watchlist", JSON.stringify(newList));
-    setIsInWatchlist(!isInWatchlist);
-  }, [isInWatchlist, watchlist, params.slug]);
-
-  // Focus management for video player
-  useEffect(() => {
-    if (showPlayer) {
-      const iframe = document.querySelector("iframe");
-      iframe?.focus();
-    }
-  }, [showPlayer]);
+  const handleWatchlistChange = (saved: boolean) => setIsInWatchlist(Boolean(saved));
 
   if (error) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Card className="p-6">
           <p className="text-red-600">{error}</p>
-          <Button onClick={() => window.location.reload()} className="mt-4">
-            Thử lại
-          </Button>
+          <Button onClick={() => window.location.reload()} className="mt-4">Thử lại</Button>
         </Card>
       </div>
     );
@@ -122,7 +143,6 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <div className="min-h-screen bg-black">
-        {/* SEO Metadata */}
         <Head>
           <title>{movie.name} - Xem phim online</title>
           <meta name="description" content={descriptionText.slice(0, 160)} />
@@ -131,42 +151,21 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
           <meta property="og:description" content={descriptionText.slice(0, 160)} />
         </Head>
 
-        {/* Hero */}
         <div className="relative h-[60vh] overflow-hidden">
-          <Image
-            src={movie.poster_url || "/fallback-poster.jpg"}
-            alt={`${movie.name} poster`}
-            fill
-            sizes="100vw"
-            priority
-            placeholder="blur"
-            blurDataURL="/low-res-poster.jpg"
-            className="object-cover"
-          />
+          <Image src={getImageUrl(movie.poster_url)} alt={`${movie.name} poster`} fill sizes="100vw" priority placeholder="blur" blurDataURL="/low-res-poster.jpg" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
 
         <div className="container mx-auto px-4 -mt-32 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Poster */}
             <div>
               <Card>
                 <div className="aspect-[2/3] relative">
-                  <Image
-                    src={movie.thumb_url || "/fallback-thumb.jpg"}
-                    alt={`${movie.name} thumbnail`}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                    loading="lazy"
-                    placeholder="blur"
-                    blurDataURL="/low-res-thumb.jpg"
-                    className="object-cover"
-                  />
+                  <Image src={getImageUrl(movie.thumb_url)} alt={`${movie.name} thumbnail`} fill sizes="(max-width: 1024px) 100vw, 33vw" loading="lazy" placeholder="blur" blurDataURL="/low-res-thumb.jpg" className="object-cover" />
                 </div>
               </Card>
             </div>
 
-            {/* Info */}
             <div className="lg:col-span-2 bg-card rounded-lg p-6">
               <h1 className="text-3xl font-bold mb-4">{movie.name}</h1>
 
@@ -179,118 +178,49 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
                   <Clock className="w-4 h-4" />
                   <span>{movie.time}</span>
                 </div>
-                <div
-                  className="flex items-center gap-1"
-                  aria-label={`Điểm đánh giá: ${movie.tmdb?.vote_average ?? "Chưa có đánh giá"}`}
-                >
+                <div className="flex items-center gap-1" aria-label={`Điểm đánh giá: ${movie.tmdb?.vote_average ?? "Chưa có đánh giá"}`}>
                   <Star className="text-yellow-400 w-4 h-4" />
                   <span>{movie.tmdb?.vote_average ?? "Chưa có đánh giá"}</span>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {movie.category?.map((cat) => (
-                  <Badge key={cat.name} variant="secondary">
-                    {cat.name}
-                  </Badge>
+                {movie.category?.map((cat: any) => (
+                  <Badge key={cat.name} variant="secondary">{cat.name}</Badge>
                 ))}
               </div>
 
-              {/* Mô tả phim */}
               <div className="mb-6">
-                <p
-                  id="movie-description"
-                  className={`text-muted-foreground transition-all duration-300 ease-in-out ${
-                    showFullDescription ? "" : "line-clamp-4"
-                  }`}
-                >
-                  {descriptionText}
-                </p>
+                <p id="movie-description" className={`text-muted-foreground transition-all duration-300 ease-in-out ${showFullDescription ? "" : "line-clamp-4"}`}>{descriptionText}</p>
 
                 {isLongDescription && (
-                  <button
-                    onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="mt-2 text-red-600 hover:underline font-semibold flex items-center gap-1 group"
-                    aria-expanded={showFullDescription}
-                    aria-controls="movie-description"
-                  >
-                    {showFullDescription ? (
-                      <>
-                        Thu gọn
-                        <svg
-                          className="w-4 h-4 rotate-180 transition-transform group-hover:scale-110"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </>
-                    ) : (
-                      <>
-                        Xem thêm
-                        <svg
-                          className="w-4 h-4 transition-transform group-hover:scale-110"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </>
-                    )}
+                  <button onClick={() => setShowFullDescription(!showFullDescription)} className="mt-2 text-red-600 hover:underline font-semibold flex items-center gap-1 group" aria-expanded={showFullDescription} aria-controls="movie-description">
+                    {showFullDescription ? "Thu gọn" : "Xem thêm"}
                   </button>
                 )}
               </div>
 
-              {/* Actions */}
               <div className="flex flex-wrap gap-4 mb-8">
-                <Link href={`/watch/${params.slug}?ep=${selectedEpisode}`}>
-                  <Button
-                    size="lg"
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                    aria-label="Xem phim ngay"
-                  >
+                <Link href={`/watch/${slug}?ep=${selectedEpisode}`}>
+                  <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white" aria-label="Xem phim ngay">
                     <Play className="mr-2 h-5 w-5" /> Xem ngay
                   </Button>
                 </Link>
 
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={toggleWatchlist}
-                  className={isInWatchlist ? "bg-red-600 text-white hover:bg-red-700" : ""}
-                  aria-label={isInWatchlist ? "Xóa khỏi danh sách theo dõi" : "Thêm vào danh sách theo dõi"}
-                >
-                  <Heart className={`mr-2 h-5 w-5 ${isInWatchlist ? "fill-current" : ""}`} />
-                  {isInWatchlist ? "Đã lưu" : "Lưu xem sau"}
-                </Button>
+                <AddToWatchlistButton movieId={slug} isSavedInit={isInWatchlist} onChange={handleWatchlistChange} />
 
                 <Button size="lg" variant="outline" aria-label="Chia sẻ phim">
                   <Share2 className="mr-2 h-5 w-5" /> Chia sẻ
                 </Button>
               </div>
 
-              {/* Episodes */}
               {episodes.length > 0 ? (
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold mb-4">Danh sách tập</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                     {episodes.map((ep, i) => {
                       const episodeName = ep.name?.trim() || `Tập ${i + 1}`;
-                      return (
-                        <Button
-                          key={i}
-                          variant={selectedEpisode === i ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedEpisode(i)}
-                          aria-label={`Chọn ${episodeName}`}
-                        >
-                          {episodeName}
-                        </Button>
-                      );
+                      return (<Button key={i} variant={selectedEpisode === i ? "default" : "outline"} size="sm" onClick={() => setSelectedEpisode(i)}>{episodeName}</Button>);
                     })}
                   </div>
                 </div>
@@ -300,38 +230,24 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
             </div>
           </div>
 
-          {/* Comment Section */}
-          <div className="mt-12">
-            <CommentSection slug={params.slug} />
-          </div>
+          <div className="mt-12"><CommentSection slug={slug} /></div>
         </div>
 
-        {/* Video Modal */}
         {showPlayer && episodes[selectedEpisode]?.link_embed && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
-            onKeyDown={(e) => e.key === "Escape" && setShowPlayer(false)}
-            tabIndex={0}
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onKeyDown={(e) => e.key === "Escape" && setShowPlayer(false)} tabIndex={0}>
             <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
               {episodes[selectedEpisode]?.link_embed ? (
                 <iframe
                   src={episodes[selectedEpisode].link_embed}
                   allowFullScreen
+                  sandbox="allow-same-origin allow-scripts"
+                  referrerPolicy="no-referrer"
                   className="w-full h-full"
                   title="Video phát phim"
                   onLoad={() => console.log("Iframe loaded")}
                 ></iframe>
-              ) : (
-                <p className="text-white">Không có link video hợp lệ.</p>
-              )}
-              <button
-                onClick={() => setShowPlayer(false)}
-                className="absolute top-2 right-2 text-white bg-black/70 hover:bg-black/90 p-2 rounded-full"
-                aria-label="Đóng trình phát video"
-              >
-                ✕
-              </button>
+              ) : (<p className="text-white">Không có link video hợp lệ.</p>)}
+              <button onClick={() => setShowPlayer(false)} className="absolute top-2 right-2 text-white bg-black/70 hover:bg-black/90 p-2 rounded-full" aria-label="Đóng trình phát video">✕</button>
             </div>
           </div>
         )}

@@ -46,8 +46,8 @@ export default function MoviesPage({ searchParams }: { searchParams: { country?:
 
   return (
     <ScrollRestore storageKey="movies-scroll" >
-      <div className="min-h-screen pt-16">
-        <h1 className="text-2xl font-bold mb-6 px-4 mt-4">
+      <div className="min-h-screen pt-16 max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6  mt-4">
           {movieSlug
             ? `${MOVIE_SLUG_LABEL[movieSlug] || movieSlug} mới nhất`
             : country
