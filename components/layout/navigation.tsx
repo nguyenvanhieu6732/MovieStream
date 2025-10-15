@@ -80,11 +80,12 @@ export function Navigation() {
   }
 
   const navLinks = [
-    { href: "/genre/drama", label: "Thể Loại" },
+    { href: "/movies?movieSlug=tv-show", label: "tv-show" },
     { href: "/movies?movieSlug=phim-le", label: "Phim Lẻ" },
     { href: "/movies?movieSlug=phim-bo", label: "Phim Bộ" },
-    { href: "/search", label: "Quốc Gia" },
-    { href: "/search", label: "Bộ Lọc" }
+    { href: "/movies?movieSlug=hoat-hinh", label: "Hoạt Hình" },
+    { href: "/movies?movieSlug=phim-chieu-rap", label: "Chiếu Rạp" },
+    { href: "/search", label: "Tìm kiếm" }
   ]
 
   return (

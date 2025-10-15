@@ -27,8 +27,11 @@ export default function LazyCarousels({ carousels }: { carousels: CarouselConfig
       setLoading(true);
       Promise.all(
         carousels.map(c =>
-          fetch(c.url)
-            .then(res => res.json())
+          fetch(c.url, { cache: 'force-cache' }) // Sử dụng cache trình duyệt
+            .then(res => {
+              if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+              return res.json();
+            })
             .then(data => [c.title, data.data?.items || []] as [string, OPhimMovie[]])
         )
       )

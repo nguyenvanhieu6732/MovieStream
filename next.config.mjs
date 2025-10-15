@@ -28,6 +28,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'scontent.fhan15-2.fna.fbcdn.net', // ✅ Thêm ảnh Facebook
       },
+      {
+        protocol: 'https',
+        hostname: 'scontent.fhan15-1.fna.fbcdn.net', // ✅ Added for the specific hostname
+      },
     ],
   },
   experimental: {

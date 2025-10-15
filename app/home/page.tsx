@@ -97,7 +97,7 @@ export default async function HomePageServer() {
         carousels={[
           {
             url: movieEndpoints[7].url,
-            title: "Phim Nhật Bản mới Oanh Tạc Chốn Này",
+            title: "Phim Nhật Bản mới nhất",
             itemsPerRow: 7,
             itemPerRowMobile: 2,
             showChevron: false,

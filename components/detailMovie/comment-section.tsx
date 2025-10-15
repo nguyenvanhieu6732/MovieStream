@@ -107,7 +107,7 @@ export default function CommentSection({ slug }: { slug: string }) {
       toast(
       () => (
         <div className="p-4">
-        <div className="mb-3 text-base font-semibold">
+        <div className="mb-3 text-base font-medium">
           Bạn có chắc chắn muốn xóa bình luận này?
         </div>
         <div className="flex gap-3 justify-end">
@@ -168,7 +168,7 @@ export default function CommentSection({ slug }: { slug: string }) {
   };
 
   return (
-    <div className="mt-12 space-y-6">
+    <div className="mt-12 space-y-6 py-6 bg-[#020817] p-6 rounded-lg">
       <h3 className="text-xl font-semibold">Bình luận</h3>
 
       <div className="flex gap-4">

@@ -23,11 +23,11 @@ export default function Footer() {
                 <div>
                     <h3 className="text-lg font-semibold text-white mb-3">Thể loại</h3>
                     <ul className="space-y-2 text-sm">
-                        <li><a href="#" className="hover:text-white transition">Hành động</a></li>
-                        <li><a href="#" className="hover:text-white transition">Tình cảm</a></li>
-                        <li><a href="#" className="hover:text-white transition">Kinh dị</a></li>
-                        <li><a href="#" className="hover:text-white transition">Hoạt hình</a></li>
-                        <li><a href="#" className="hover:text-white transition">Viễn tưởng</a></li>
+                        <li><a href="/movies?movieSlug=hanh-dong" className="hover:text-white transition">Hành động</a></li>
+                        <li><a href="/movies?movieSlug=tinh-cam" className="hover:text-white transition">Tình cảm</a></li>
+                        <li><a href="/movies?movieSlug=kinh-di" className="hover:text-white transition">Kinh dị</a></li>
+                        <li><a href="/movies?movieSlug=hoat-hinh" className="hover:text-white transition">Hoạt hình</a></li>
+                        <li><a href="/movies?movieSlug=vien-tuong" className="hover:text-white transition">Viễn tưởng</a></li>
                     </ul>
                 </div>
 
@@ -46,9 +46,9 @@ export default function Footer() {
                 <div>
                     <h3 className="text-lg font-semibold text-white mb-3">Kết nối</h3>
                     <div className="flex gap-4 mt-2">
-                        <a href="#" className="hover:text-white"><Facebook size={20} /></a>
-                        <a href="#" className="hover:text-white"><Instagram size={20} /></a>
-                        <a href="#" className="hover:text-white"><Youtube size={20} /></a>
+                        <a href="https://www.facebook.com/nguyenhieu.241967" className="hover:text-white"><Facebook size={20} /></a>
+                        <a href="https://www.instagram.com/im.hieu037/" className="hover:text-white"><Instagram size={20} /></a>
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="hover:text-white"><Youtube size={20} /></a>
                     </div>
                 </div>
             </div>

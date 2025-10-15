@@ -7,17 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/////////////////////// Account models ///////////////////////
+
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
+  id             String               @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String               @unique
+  emailVerified  DateTime?
+  image          String?
   hashedPassword String?
-  accounts      Account[]
-  sessions      Session[]
-  watchlist     Watchlist[]
-  comments      Comment[] // Quan hệ với Comment
+  accounts       Account[]
+  sessions       Session[]
+  watchlist      Watchlist[]
+  comments       Comment[]
+  // relations
+  subscriptions  Subscription[]       @relation("UserSubscriptions")
+  payments       Payment[]            @relation("UserPayments")
+  familyMemberOf SubscriptionMember[] @relation("FamilyMemberOf")
 }
 
 model Account {
@@ -63,13 +69,15 @@ model Watchlist {
   @@unique([userId, movieId])
 }
 
+/////////////////////// Comments models ///////////////////////
+
 model Post {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   slug      String    @unique
   title     String
   content   String
   createdAt DateTime  @default(now())
-  comments  Comment[] // Quan hệ với Comment
+  comments  Comment[]
 }
 
 model Comment {
@@ -80,4 +88,64 @@ model Comment {
   postId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+/////////////////////// Premium models ///////////////////////
+
+model PremiumPlan {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  key          String         @unique        // e.g. "personal_month", "family_year"
+  name         String
+  price        Float          // price value in VND (e.g. 99000)
+  currency     String         @default("VND")
+  duration     String         // "month" | "year"
+  maxMembers   Int            @default(1)
+  description  String?
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId     String       @db.ObjectId     // who purchased (account owner)
+  planId      String       @db.ObjectId
+  startDate   DateTime     @default(now())
+  endDate     DateTime
+  status      String       @default("active") // "active" | "expired" | "canceled"
+  paymentId   String?      @db.ObjectId
+
+  owner       User         @relation("UserSubscriptions", fields: [ownerId], references: [id])
+  plan        PremiumPlan  @relation(fields: [planId], references: [id])
+  members     SubscriptionMember[]
+
+  @@index([ownerId])
+}
+
+model SubscriptionMember {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  subscriptionId String       @db.ObjectId
+  userId         String       @db.ObjectId
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  user           User         @relation("FamilyMemberOf", fields: [userId], references: [id])
+
+  @@unique([subscriptionId, userId])
+}
+
+model Payment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  amount        Float
+  currency      String   @default("VND")
+  method        String   // "vnpay", "momo", "stripe", ...
+  status        String   // "pending", "success", "failed"
+  transactionId String?  // txnRef / external id
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  user User @relation("UserPayments", fields: [userId], references: [id])
+
+  @@index([userId])
 }

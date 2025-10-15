@@ -83,7 +83,6 @@ export default function LoginPage() {
               <Label>Email</Label>
               <Input
                 type="email"
-                autoComplete="off"
                 placeholder="Nhập email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
