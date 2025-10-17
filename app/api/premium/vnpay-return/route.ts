@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import qs from "qs";
 import { PrismaClient } from "@prisma/client";
+export const dynamic = "force-dynamic";
 
 const prisma = new PrismaClient();
 const secretKey = process.env.VNPAY_HASH_SECRET!;
