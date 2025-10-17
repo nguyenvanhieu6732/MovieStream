@@ -29,7 +29,6 @@ type Plan = {
 export default function ProfilePage() {
   const { data: session, update, status } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const [name, setName] = useState<string>(session?.user?.name ?? "");
@@ -64,26 +63,30 @@ export default function ProfilePage() {
     }
   }, [session?.user?.name, session?.user?.image]);
 
-  useEffect(() => {
-    const p = searchParams.get("payment");
-    if (!p) return;
-    if (p === "success") {
-      toast.success("Thanh toán thành công! Gói đã được kích hoạt.");
-    } else if (p === "failed") {
-      toast.error("Thanh toán thất bại hoặc bị hủy.");
-    } else if (p === "invalid") {
-      toast.error("Chữ ký VNPay không hợp lệ.");
-    } else {
-      toast.message( `Kết quả thanh toán: ${p}`);
-    }
+useEffect(() => {
+  if (typeof window === "undefined") return;
 
-    try {
-      const pathname = window.location.pathname;
-      router.replace(pathname);
-    } catch {
-    }
-    fetchPremiumStatus();
-  }, [searchParams]);
+  const params = new URLSearchParams(window.location.search);
+  const p = params.get("payment");
+  if (!p) return;
+
+  if (p === "success") {
+    toast.success("Thanh toán thành công! Gói đã được kích hoạt.");
+  } else if (p === "failed") {
+    toast.error("Thanh toán thất bại hoặc bị hủy.");
+  } else if (p === "invalid") {
+    toast.error("Chữ ký VNPay không hợp lệ.");
+  } else {
+    toast.message(`Kết quả thanh toán: ${p}`);
+  }
+
+  try {
+    const pathname = window.location.pathname;
+    router.replace(pathname);
+  } catch {}
+
+  fetchPremiumStatus();
+}, []);
 
   useEffect(() => {
     (async () => {
