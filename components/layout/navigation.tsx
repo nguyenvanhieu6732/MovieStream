@@ -194,6 +194,9 @@ export function Navigation() {
             ))}
             {session?.user ? (
               <>
+                {session.user.role === "admin" && (
+                  <Link href="/system"><Button variant="ghost" className="w-full">Hệ Thống</Button></Link>
+                )}
                 <Link href="/profile"><Button variant="ghost" className="w-full">Profile</Button></Link>
                 <Link href="/watchlist"><Button variant="ghost" className="w-full">Watchlist</Button></Link>
                 <Button onClick={() => signOut()} className="w-full" variant="destructive">Đăng Xuất</Button>

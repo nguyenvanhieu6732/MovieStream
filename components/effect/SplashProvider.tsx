@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import { useDeviceType } from "@/hooks/use-mobile";
+
 
 export default function SplashProvider({ children }: { children: React.ReactNode }) {
   const [hideSplash, setHideSplash] = useState(false)
-
+  const device = useDeviceType();
   useEffect(() => {
     // Scroll về đầu trang khi hiển thị splash
     window.scrollTo(0, 0)
@@ -54,12 +56,17 @@ export default function SplashProvider({ children }: { children: React.ReactNode
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                   MovieStream
                 </h1>
-                <p className="text-xs sm:text-sm md:text-base text-gray-300 italic mt-1">
-                  Phim hay trên MovieStream
-                </p>
-                <p className="mt-3 text-xs sm:text-sm md:text-base font-medium text-gray-400 max-w-[300px] leading-snug">
-                  Xem Phim Miễn Phí Cực Nhanh, Chất Lượng Cao Và Cập Nhật Liên Tục
-                </p>
+                {device !== "mobile" && (
+                  <>
+                    <p className="text-xs sm:text-sm md:text-base text-gray-300 italic mt-1">
+                      Phim hay trên MovieStream
+                    </p>
+                    <p className="mt-3 text-xs sm:text-sm md:text-base font-medium text-gray-400 max-w-[300px] leading-snug">
+                      Xem Phim Miễn Phí Cực Nhanh, Chất Lượng Cao Và Cập Nhật Liên Tục
+                    </p>
+                  </>
+                )}
+
               </div>
             </motion.div>
           </motion.div>
