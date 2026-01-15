@@ -32,6 +32,7 @@ export function Navigation() {
 
   const router = useRouter()
   const debouncedQuery = useDebounce(searchQuery, 400)
+  const closeMenu = () => setIsMenuOpen(false)
 
   const { data: session } = useSession()
 
@@ -92,13 +93,17 @@ export function Navigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-[1000] transition-colors duration-500 min-h-[64px]
-    ${scrolled
+      className={`
+    fixed top-0 left-0 w-full z-[1000]
+    transition-colors duration-300
+    min-h-[64px]
+    text-white
+    ${scrolled || isMenuOpen
           ? "bg-black/90 backdrop-blur-md border-b border-gray-800"
           : "bg-transparent"
         }
-    text-white
   `}
+
     >
 
       <div className="nav-container">
@@ -181,7 +186,7 @@ export function Navigation() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden flex flex-col space-y-2 py-2">
+          <div className="md:hidden fixed top-16 left-0 w-full bg-black/95 backdrop-blur-md flex flex-col space-y-2 py-4 px-4 border-t border-gray-800">
             {navLinks.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setIsMenuOpen(false)} className="px-2">
                 {label}
@@ -195,8 +200,8 @@ export function Navigation() {
               </>
             ) : (
               <>
-                <Link href="/auth/signin"><Button variant="ghost" className="w-full">Đăng Nhập</Button></Link>
-                <Link href="/register"><Button className="w-full">Đăng Ký</Button></Link>
+                <Link href="/login"><Button variant="ghost" className="w-full" onClick={closeMenu}>Đăng Nhập</Button></Link>
+                <Link href="/register"><Button className="w-full" onClick={closeMenu}>Đăng Ký</Button></Link>
               </>
             )}
           </div>
