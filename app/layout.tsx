@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     description: "Stream the latest movies and TV shows online.",
     images: ["/favicon.ico"],
   },
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({

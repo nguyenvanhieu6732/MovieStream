@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, Star } from "lucide-react";
+import { Play, Star, Ticket } from "lucide-react";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import CommentSection from "@/components/detailMovie/comment-section";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { LoadingEffect } from "@/components/effect/loading-effect";
+import { useSession } from "next-auth/react";
 
 export default function WatchPage({ params }: { params: { slug: string } }) {
   const { slug } = useParams();
@@ -26,13 +27,21 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
   const defaultEpisode = epFromQuery ? parseInt(epFromQuery) : 0;
   const [selectedEpisode, setSelectedEpisode] = useState(defaultEpisode);
+  const [isMoviePremium, setIsMoviePremium] = useState(false)
+  const [isUserPremium, setIsUserPremium] = useState(false)
+  const { data: session } = useSession()
+
+  const canWatch =
+    !isMoviePremium ||
+    isUserPremium ||
+    session?.user?.role === "admin"
+
 
   useEffect(() => {
     const fetchMovie = async () => {
       try {
         const res = await fetch(`https://ophim1.com/phim/${slug}`);
         const json = await res.json();
-        // Lưu ý: Dữ liệu từ API không khớp trực tiếp với schema Post, chỉ dùng slug để tìm Post
         setMovie({
           ...json.movie,
           episodes: json.episodes,
@@ -58,6 +67,29 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
     fetchMovie();
     document.documentElement.classList.add("dark");
   }, [slug]);
+
+  useEffect(() => {
+    const checkMoviePremium = async () => {
+      const res = await fetch(`/api/premium-check/check?slug=${slug}`)
+      if (!res.ok) return
+      const data = await res.json()
+      setIsMoviePremium(Boolean(data.isPremium))
+    }
+    checkMoviePremium()
+  }, [slug])
+
+
+  useEffect(() => {
+    const checkUserPremium = async () => {
+      const res = await fetch("/api/premium/status")
+      if (!res.ok) return
+      const data = await res.json()
+      setIsUserPremium(Boolean(data.isPremium))
+    }
+    checkUserPremium()
+  }, [])
+
+
 
   useEffect(() => {
     setIsPlaying(false);
@@ -86,50 +118,75 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
         {/* Video player */}
         <Card className="mb-6 bg-black border-gray-800">
           <div className="aspect-video relative rounded-md overflow-hidden">
+
             {!isPlaying ? (
-              <div className="aspect-video relative rounded-md overflow-hidden">
+              /* ================= POSTER ================= */
+              <div className="aspect-video relative">
                 <Image
                   src={movie.poster_url}
                   alt={`Poster ${movie.name}`}
                   fill
                   className="object-cover brightness-75"
                 />
-                <button
-                  onClick={() => setIsPlaying(true)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition"
-                >
-                  <Play className="w-12 h-12 text-white" />
-                </button>
-              </div>
-            ) : currentEpisode.link_embed ? (
-              <iframe
-                src={currentEpisode.link_embed}
-                allowFullScreen
-                className="w-full h-full"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-black/70 text-red-500">
-                <div className="text-center p-4 border border-red-500 rounded-lg bg-black/60 backdrop-blur-sm">
-                  <svg
-                    className="mx-auto mb-2 h-10 w-10 text-red-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+
+                {/* 🔒 PREMIUM + KHÔNG CÓ QUYỀN */}
+                {!canWatch && isMoviePremium ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-center p-4">
+                    <Ticket className="w-12 h-12 text-yellow-400 mb-2" />
+                    <p className="text-lg font-semibold text-yellow-400">
+                      Phim Premium
+                    </p>
+                    <p className="text-sm text-white/80 mb-4">
+                      Bạn cần nâng cấp tài khoản để xem phim này
+                    </p>
+                    <Link href="/profile">
+                      <Button className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                        Nâng cấp Premium
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  /* ▶️ CÓ QUYỀN → PLAY */
+                  <button
+                    onClick={() => setIsPlaying(true)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01M12 19c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z"
-                    />
-                  </svg>
-                  <p className="text-lg font-semibold">Không thể phát video</p>
-                  <p className="text-sm text-white/80">Link bị lỗi hoặc không tồn tại. Vui lòng thử lại sau.</p>
+                    <Play className="w-12 h-12 text-white" />
+                  </button>
+                )}
+              </div>
+
+            ) : canWatch ? (
+              /* ================= ĐANG PLAY ================= */
+
+              currentEpisode?.link_embed ? (
+                <iframe
+                  src={currentEpisode.link_embed}
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              ) : (
+                /* ⚠️ LINK LỖI */
+                <div className="w-full h-full flex items-center justify-center bg-black/70 text-red-500">
+                  <div className="text-center p-4 border border-red-500 rounded-lg bg-black/60">
+                    <p className="text-lg font-semibold">Không thể phát video</p>
+                    <p className="text-sm text-white/80">
+                      Link bị lỗi hoặc không tồn tại
+                    </p>
+                  </div>
                 </div>
+              )
+
+            ) : (
+              /* 🚫 KHÔNG CÓ QUYỀN */
+              <div className="w-full h-full flex items-center justify-center bg-black/70 text-red-500">
+                <p>Bạn không có quyền xem nội dung này</p>
               </div>
             )}
+
           </div>
         </Card>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main content */}
@@ -157,7 +214,6 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                   ))}
                 </div>
 
-                {/* Mô tả có xem thêm/thu gọn */}
                 <div className="text-gray-400 leading-relaxed">
                   <p
                     className={`transition-all duration-300 ease-in-out ${showFullDescription ? "" : "line-clamp-4"
@@ -191,7 +247,6 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
               </CardContent>
             </Card>
 
-            {/* Danh sách tập */}
             {episodeList.length > 0 && (
               <Card className="bg-gray-900 border-gray-800">
                 <CardContent className="p-6">

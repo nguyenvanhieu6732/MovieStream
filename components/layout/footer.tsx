@@ -3,6 +3,7 @@
 
 import { Facebook, Instagram, Youtube, ArrowUp, Film } from "lucide-react"
 import ScrollToTopButton from "../scrollEffect/ScrollToTopButton"
+import Image from "next/image"
 
 export default function Footer() {
     return (
@@ -11,8 +12,8 @@ export default function Footer() {
                 {/* Logo + Slogan */}
                 <div>
                     <div className="flex items-center space-x-2 mb-3">
-                        <Film className="h-8 w-8 text-red-600" />
-                        <h2 className="text-2xl font-bold text-white">MovieStream</h2>
+                        <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
+                        <span className="text-xl font-bold">MovieStream</span>
                     </div>
                     <p className="text-sm text-gray-400 leading-relaxed">
                         Xem phim online miễn phí chất lượng cao, cập nhật liên tục. Giao diện đẹp, không quảng cáo, dễ dùng trên mọi thiết bị.

@@ -75,7 +75,7 @@ export default function SearchPage() {
 
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative max-w-2xl">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" />
             <Input
               type="search"
               placeholder="Tìm kiếm phim..."

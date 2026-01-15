@@ -12,10 +12,20 @@ datasource db {
 model User {
   id             String               @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
-  email          String               @unique
+  email          String?              @unique
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+
+  role           String   @default("user") // user | admin | moderator
+  status         String   @default("active") // active | inactive | pending
+  isBanned       Boolean  @default(false)
+  isDeleted      Boolean  @default(false)
+  bannedAt       DateTime?
+  banReason      String?
+  deletedAt      DateTime? 
+  createdAt DateTime @default(now())
+
   accounts       Account[]
   sessions       Session[]
   watchlist      Watchlist[]
@@ -148,4 +158,13 @@ model Payment {
   user User @relation("UserPayments", fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+/////////////////////// Premium Movie ///////////////////////
+
+model PremiumMovie {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug      String   @unique   // slug phim bên ophim
+  note      String?            // ghi chú admin
+  createdAt DateTime @default(now())
 }

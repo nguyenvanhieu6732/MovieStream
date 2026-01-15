@@ -13,6 +13,7 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      role?: "user" | "admin";
     };
   }
   interface JWT {
@@ -20,6 +21,7 @@ declare module "next-auth" {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    role?: "user" | "admin";
   }
 }
 
@@ -59,6 +61,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name ?? undefined,
           email: user.email ?? undefined,
           image: user.image ?? undefined,
+          role: user.role ?? "user", // Hoặc lấy từ database nếu có trường role
         };
       },
     }),
@@ -70,39 +73,71 @@ export const authOptions: NextAuthOptions = {
     signIn: "/",
     error: "/",
   },
+
   callbacks: {
     async jwt({ token, user }) {
+      // LẦN ĐẦU LOGIN
       if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.image = user.image;
-      } else {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email ?? undefined },
-          select: { id: true, name: true, email: true, image: true },
-        });
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.name = dbUser.name;
-          token.email = dbUser.email;
-          token.image = dbUser.image;
-        }
+        token.id = user.id
+        token.role = user.role
+        token.image = user.image
+        return token
       }
-      return token;
+
+      if (!token.id) return token
+
+      const dbUser = await prisma.user.findUnique({
+        where: { id: token.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+        },
+      })
+
+      if (!dbUser) return token
+
+      token.name = dbUser.name
+      token.email = dbUser.email
+      token.image = dbUser.image
+      token.role = dbUser.role
+
+      return token
     },
+
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.name = token.name ?? null;
-        session.user.email = token.email ?? null;
-        session.user.image = token.image ?? null;
+      if (session.user && token.id) {
+        session.user.id = token.id as string
+        session.user.role = token.role as "user" | "admin"
       }
-      return session;
+      return session
     },
+    async signIn({ user }) {
+      if (!user?.id) return false
+
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          isBanned: true,
+          isDeleted: true,
+        },
+      })
+
+      if (!dbUser) return false
+
+      // ❌ BỊ BAN / DELETE
+      if (dbUser.isBanned || dbUser.isDeleted) {
+        throw new Error("ACCOUNT_DISABLED")
+      }
+
+      return true
+
+    },
+    secret: process.env.NEXTAUTH_SECRET,
   },
-  secret: process.env.NEXTAUTH_SECRET,
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+  const handler = NextAuth(authOptions);
+  export { handler as GET, handler as POST };

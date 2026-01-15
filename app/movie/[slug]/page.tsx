@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, Play, Share2, Star } from "lucide-react";
+import { Calendar, Clock, Play, Share2, Star, Ticket } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import Head from "next/head";
@@ -15,7 +15,11 @@ import { LoadingEffect } from "@/components/effect/loading-effect";
 import { MovieItem } from "@/lib/interface";
 import AddToWatchlistButton from "@/components/button/AddToWatchlistButton";
 import { getImageUrl } from "@/lib/getImageUrl";
-import { prisma } from "@/lib/prisma"; // Thêm import prisma
+import { useSession } from "next-auth/react";
+import confirmToast from "@/lib/confirmToast";
+import { toast } from "sonner"
+
+
 
 const CommentSection = dynamic(() => import("@/components/detailMovie/comment-section"), {
   loading: () => <LoadingEffect />,
@@ -46,6 +50,10 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isLongDescription, setIsLongDescription] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession()
+  const [isPremium, setIsPremium] = useState(false);
+  const [loadingPremium, setLoadingPremium] = useState(false);
+
 
   const descriptionText = useMemo(() => extractTextFromHtml(movie?.content || ""), [movie]);
 
@@ -98,7 +106,102 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
     return () => controller.abort();
   }, [slug]);
 
-  // Check saved status from DB via API
+  const handleShare = async () => {
+    const url = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: movie?.name,
+          text: `Xem phim ${movie?.name}`,
+          url,
+        });
+      } catch (err) {
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Đã sao chép link phim!");
+      } catch (err) {
+      }
+    }
+  };
+
+
+async function doTogglePremium() {
+  if (!movie?.slug) return
+
+  try {
+    setLoadingPremium(true)
+
+    const res = await fetch("/api/admin/premium-movies", {
+      method: isPremium ? "DELETE" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slug: movie.slug,
+        note: movie.name,
+      }),
+    })
+
+    if (!res.ok) {
+      throw new Error("Request failed")
+    }
+
+    setIsPremium((prev) => !prev)
+
+    toast.success(
+      isPremium
+        ? "Đã gỡ phim khỏi danh sách Premium"
+        : "Đã thêm phim vào danh sách Premium"
+    )
+  } catch (error) {
+    toast.error("Thao tác thất bại, vui lòng thử lại")
+  } finally {
+    setLoadingPremium(false)
+  }
+}
+
+
+
+
+  function confirmTogglePremium() {
+    confirmToast(
+      isPremium
+        ? `Gỡ phim "${movie?.name}" khỏi Premium?`
+        : `Thêm phim "${movie?.name}" vào Premium?`,
+      doTogglePremium
+    )
+  }
+
+
+
+
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkPremium = async () => {
+      try {
+        const res = await fetch(`/api/premium-check/check?slug=${slug}`);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (mounted) {
+          setIsPremium(Boolean(data.isPremium));
+        }
+      } catch (err) {
+        console.error("Check premium failed", err);
+      }
+    };
+
+    checkPremium();
+    return () => {
+      mounted = false;
+    };
+  }, [slug]);
+
+
+
   useEffect(() => {
     let mounted = true;
     const checkSaved = async () => {
@@ -167,7 +270,16 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
             </div>
 
             <div className="lg:col-span-2 bg-card rounded-lg p-6">
-              <h1 className="text-3xl font-bold mb-4">{movie.name}</h1>
+              <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
+                {movie.name}
+
+                {isPremium && (
+                  <Badge variant="destructive" className="text-sm">
+                    PREMIUM
+                  </Badge>
+                )}
+              </h1>
+
 
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center gap-1" aria-label={`Năm phát hành: ${movie.year}`}>
@@ -209,9 +321,28 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
 
                 <AddToWatchlistButton movieId={slug} isSavedInit={isInWatchlist} onChange={handleWatchlistChange} />
 
-                <Button size="lg" variant="outline" aria-label="Chia sẻ phim">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  aria-label="Chia sẻ phim"
+                  onClick={handleShare}
+                >
                   <Share2 className="mr-2 h-5 w-5" /> Chia sẻ
                 </Button>
+                {session?.user?.role === "admin" && (
+                  <Button
+                    size="lg"
+                    variant={isPremium ? "destructive" : "outline"}
+                    disabled={loadingPremium}
+                    onClick={confirmTogglePremium}
+                  >
+                    <Ticket className="mr-2 h-5 w-5" />
+                    {isPremium ? "Gỡ Premium" : "Thêm Premium"}
+                  </Button>
+                )}
+
+
+
               </div>
 
               {episodes.length > 0 ? (

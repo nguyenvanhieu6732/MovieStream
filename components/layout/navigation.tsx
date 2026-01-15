@@ -4,7 +4,8 @@ import React, { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Search, Menu, X, Film, LogOut, User, Heart
+  Search, Menu, X, Film, LogOut, User, Heart,
+  Settings
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,7 @@ import { useDebounce } from "@/hooks/useDebounce"
 import { OPhimMovie } from "@/lib/interface"
 import { SearchDropdown } from "../home/SearchDropdown"
 import { useSession, signOut } from "next-auth/react"
+import Image from "next/image"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -91,16 +93,19 @@ export function Navigation() {
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-[1000] transition-colors duration-500 min-h-[64px]
-        ${scrolled
+    ${scrolled
           ? "bg-black/90 backdrop-blur-md border-b border-gray-800"
           : "bg-transparent"
-        }`}
+        }
+    text-white
+  `}
     >
+
       <div className="nav-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Film className="h-8 w-8 text-red-600" />
+            <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
             <span className="text-xl font-bold">MovieStream</span>
           </Link>
 
@@ -141,14 +146,22 @@ export function Navigation() {
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" sideOffset={8} alignOffset={-4} className="dropdown-menu-content">
+                  {session.user.role === "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/system">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Hệ Thống
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
-                    <Link href="/profile"><User className="mr-2 h-4 w-4" /> Profile</Link>
+                    <Link href="/profile"><User className="mr-2 h-4 w-4" /> Hồ Sơ</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/watchlist"><Heart className="mr-2 h-4 w-4" /> Watchlist</Link>
+                    <Link href="/watchlist"><Heart className="mr-2 h-4 w-4" /> Xem Sau</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
+                    <LogOut className="mr-2 h-4 w-4" /> Đăng Xuất
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
