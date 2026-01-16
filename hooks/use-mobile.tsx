@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 
 const BREAKPOINTS = {
@@ -7,6 +9,7 @@ const BREAKPOINTS = {
 
 type DeviceType = "mobile" | "tablet" | "desktop"
 
+/* ========= HOOK CŨ – GIỮ NGUYÊN ========= */
 export function useDeviceType(): DeviceType | null {
   const [device, setDevice] = useState<DeviceType | null>(null)
 
@@ -28,4 +31,10 @@ export function useDeviceType(): DeviceType | null {
   }, [])
 
   return device
+}
+
+/* ========= HOOK SHADCN CẦN ========= */
+export function useIsMobile(): boolean {
+  const device = useDeviceType()
+  return device === "mobile" || device === "tablet"
 }

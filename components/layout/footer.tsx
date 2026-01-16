@@ -1,7 +1,7 @@
 "use client"
 
 
-import { Facebook, Instagram, Youtube, ArrowUp, Film } from "lucide-react"
+import { Facebook, Instagram, Youtube } from "lucide-react"
 import ScrollToTopButton from "../scrollEffect/ScrollToTopButton"
 import Image from "next/image"
 

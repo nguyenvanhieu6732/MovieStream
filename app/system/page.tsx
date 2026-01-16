@@ -7,7 +7,7 @@ export default async function SystemPage() {
     const totalMovies = movieCountJson?.data?.params?.pagination?.totalItems ?? 0
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+            <h1 className="text-2xl font-bold mb-4">Chi Tiết</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 rounded shadow">

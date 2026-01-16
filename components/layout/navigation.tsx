@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Search, Menu, X, Film, LogOut, User, Heart,
+  Search, Menu, X, LogOut, User, Heart,
   Settings
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -109,7 +109,7 @@ export function Navigation() {
       <div className="nav-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2" onClick={closeMenu}>
             <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
             <span className="text-xl font-bold">MovieStream</span>
           </Link>
@@ -195,10 +195,10 @@ export function Navigation() {
             {session?.user ? (
               <>
                 {session.user.role === "admin" && (
-                  <Link href="/system"><Button variant="ghost" className="w-full">Hệ Thống</Button></Link>
+                  <Link href="/system"><Button variant="ghost" className="w-full" onClick={closeMenu}>Hệ Thống</Button></Link>
                 )}
-                <Link href="/profile"><Button variant="ghost" className="w-full">Profile</Button></Link>
-                <Link href="/watchlist"><Button variant="ghost" className="w-full">Watchlist</Button></Link>
+                <Link href="/profile"><Button variant="ghost" className="w-full" onClick={closeMenu}>Hồ Sơ</Button></Link>
+                <Link href="/watchlist"><Button variant="ghost" className="w-full" onClick={closeMenu}>Xem Sau</Button></Link>
                 <Button onClick={() => signOut()} className="w-full" variant="destructive">Đăng Xuất</Button>
               </>
             ) : (

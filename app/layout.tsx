@@ -8,6 +8,7 @@ import { Navigation } from "@/components/layout/navigation"
 import SplashProvider from "@/components/effect/SplashProvider"
 import AuthProvider from "@/providers/session-provider"
 import { Toaster } from "sonner"  // ✅ Thêm
+import HeaderWrapper from "@/components/layout/HeaderWrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -33,7 +34,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <SplashProvider>
-              <Navigation />
+              <HeaderWrapper />
               {children}
               <Footer />
               <Toaster richColors position="top-center" />
