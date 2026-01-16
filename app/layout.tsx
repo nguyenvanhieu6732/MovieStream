@@ -9,6 +9,7 @@ import SplashProvider from "@/components/effect/SplashProvider"
 import AuthProvider from "@/providers/session-provider"
 import { Toaster } from "sonner"  // ✅ Thêm
 import HeaderWrapper from "@/components/layout/HeaderWrapper"
+import FooterWrapper from "@/components/layout/FooterWrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -36,7 +37,7 @@ export default function RootLayout({
             <SplashProvider>
               <HeaderWrapper />
               {children}
-              <Footer />
+              <FooterWrapper />
               <Toaster richColors position="top-center" />
             </SplashProvider>
           </AuthProvider>
