@@ -111,6 +111,9 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token.id) {
         session.user.id = token.id as string
         session.user.role = token.role as "user" | "admin"
+        session.user.image = token.image as string | null
+        session.user.name = token.name as string | null
+        session.user.email = token.email as string | null
       }
       return session
     },
@@ -139,5 +142,5 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-  const handler = NextAuth(authOptions);
-  export { handler as GET, handler as POST };
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

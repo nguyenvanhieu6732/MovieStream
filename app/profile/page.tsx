@@ -59,34 +59,35 @@ export default function ProfilePage() {
   useEffect(() => {
     if (session?.user) {
       setName(session.user.name ?? "");
-      setAvatarUrl(session.user.image ?? undefined);
+      setAvatarUrl((prev) => prev ?? session.user.image ?? undefined);
     }
   }, [session?.user?.name, session?.user?.image]);
 
-useEffect(() => {
-  if (typeof window === "undefined") return;
 
-  const params = new URLSearchParams(window.location.search);
-  const p = params.get("payment");
-  if (!p) return;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-  if (p === "success") {
-    toast.success("Thanh toán thành công! Gói đã được kích hoạt.");
-  } else if (p === "failed") {
-    toast.error("Thanh toán thất bại hoặc bị hủy.");
-  } else if (p === "invalid") {
-    toast.error("Chữ ký VNPay không hợp lệ.");
-  } else {
-    toast.message(`Kết quả thanh toán: ${p}`);
-  }
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get("payment");
+    if (!p) return;
 
-  try {
-    const pathname = window.location.pathname;
-    router.replace(pathname);
-  } catch {}
+    if (p === "success") {
+      toast.success("Thanh toán thành công! Gói đã được kích hoạt.");
+    } else if (p === "failed") {
+      toast.error("Thanh toán thất bại hoặc bị hủy.");
+    } else if (p === "invalid") {
+      toast.error("Chữ ký VNPay không hợp lệ.");
+    } else {
+      toast.message(`Kết quả thanh toán: ${p}`);
+    }
 
-  fetchPremiumStatus();
-}, []);
+    try {
+      const pathname = window.location.pathname;
+      router.replace(pathname);
+    } catch { }
+
+    fetchPremiumStatus();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -154,7 +155,7 @@ useEffect(() => {
           toast.error("Upload ảnh thất bại");
           return;
         }
-        setAvatarUrl(data.secure_url);
+        setAvatarUrl(`${data.secure_url}?t=${Date.now()}`);
         toast.success("Upload ảnh thành công");
       } catch (err) {
         console.error(err);
@@ -189,7 +190,11 @@ useEffect(() => {
         return;
       }
       const data = await res.json();
-      await update?.({ name: data.user.name, image: data.user.image });
+      await update?.({
+        name: data.user.name,
+        image: data.user.image ? `${data.user.image}?t=${Date.now()}` : undefined,
+      });
+
       toast.success("Cập nhật thành công");
       router.refresh();
     } catch (err) {
@@ -286,13 +291,18 @@ useEffect(() => {
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 relative rounded-full overflow-hidden bg-neutral-700">
                 {avatarUrl ? (
-                  <Image src={getImageUrl(avatarUrl)} alt="avatar" fill sizes="128px" className="object-cover" priority />
+                  <img
+                    src={getImageUrl(avatarUrl)}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="flex items-center justify-center w-full h-full text-2xl font-bold text-white/80">
                     {name?.charAt(0) ?? "U"}
                   </div>
                 )}
               </div>
+
 
               <div className="mt-4 flex flex-col items-center gap-2">
                 {isRestrictedDomain() ? (
