@@ -30,6 +30,8 @@ export function Navigation() {
   const [showDropdown, setShowDropdown] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
+  const [showPopup, setShowPopup] = useState(false)
+
   const router = useRouter()
   const debouncedQuery = useDebounce(searchQuery, 400)
   const closeMenu = () => setIsMenuOpen(false)
@@ -77,139 +79,227 @@ export function Navigation() {
   const handleBlur = () => {
     blurTimeout = setTimeout(() => setShowDropdown(false), 150)
   }
+
   const handleFocus = () => {
     clearTimeout(blurTimeout)
     if (searchResults.length > 0) setShowDropdown(true)
   }
 
   const navLinks = [
+    { label: "Bác?", popup: true },
     { href: "/movies?movieSlug=tv-show", label: "tv-show" },
     { href: "/movies?movieSlug=phim-le", label: "Phim Lẻ" },
     { href: "/movies?movieSlug=phim-bo", label: "Phim Bộ" },
     { href: "/movies?movieSlug=hoat-hinh", label: "Hoạt Hình" },
     { href: "/movies?movieSlug=phim-chieu-rap", label: "Chiếu Rạp" },
-    { href: "/search", label: "Tìm kiếm" }
+    { href: "/search", label: "Tìm kiếm" },
   ]
 
   return (
-    <nav
-      className={`
-    fixed top-0 left-0 w-full z-[1000]
-    transition-colors duration-300
-    min-h-[64px]
-    text-white
-    ${scrolled || isMenuOpen
-          ? "bg-black/90 backdrop-blur-md border-b border-gray-800"
-          : "bg-transparent"
-        }
-  `}
+    <>
+      <nav
+        className={`
+        fixed top-0 left-0 w-full z-[1000]
+        transition-colors duration-300
+        min-h-[64px]
+        text-white
+        ${scrolled || isMenuOpen
+            ? "bg-black/90 backdrop-blur-md border-b border-gray-800"
+            : "bg-transparent"
+          }
+        `}
+      >
 
-    >
+        <div className="nav-container">
+          <div className="flex items-center justify-between h-16">
 
-      <div className="nav-container">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2" onClick={closeMenu}>
-            <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
-            <span className="text-xl font-bold">MovieStream</span>
-          </Link>
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2" onClick={closeMenu}>
+              <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
+              <span className="text-xl font-bold">MovieStream</span>
+            </Link>
 
-          {/* Search */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md relative mx-8">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Tìm kiếm phim..."
-              className="pl-10 bg-gray-800 rounded-xl bg-gray-800/60 border border-gray-700"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-            />
-            {showDropdown && searchResults.length > 0 && (
-              <SearchDropdown results={searchResults} onClose={() => setShowDropdown(false)} />
-            )}
-          </form>
+            {/* Search */}
+            <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md relative mx-8">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map(({ href, label }) => (
-              <Link key={href} href={href}>{label}</Link>
-            ))}
-          </div>
+              <Input
+                type="search"
+                placeholder="Tìm kiếm phim..."
+                className="pl-10 bg-gray-800 rounded-xl bg-gray-800/60 border border-gray-700"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+              />
 
-          {/* Actions */}
-          <div className="flex items-center nav-actions">
-            {session?.user ? (
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild className="dropdown-menu-trigger">
-                  <Avatar className="h-10 w-10 mx-4 cursor-pointer avatar flex items-center justify-center">
-                    <AvatarImage src={session?.user?.image ?? "/placeholder.svg"} />
-                    <AvatarFallback>
-                      {session?.user?.name?.charAt(0) ?? "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" sideOffset={8} alignOffset={-4} className="dropdown-menu-content">
-                  {session.user.role === "admin" && (
+              {showDropdown && searchResults.length > 0 && (
+                <SearchDropdown
+                  results={searchResults}
+                  onClose={() => setShowDropdown(false)}
+                />
+              )}
+            </form>
+
+            {/* Desktop Nav */}
+            <div className="hidden md:flex items-center space-x-6">
+              {navLinks.map((item, i) =>
+                item.popup ? (
+                  <button
+                    key={i}
+                    onClick={() => setShowPopup(true)}
+                    className="hover:text-gray-300"
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  <Link key={i} href={item.href!}>
+                    {item.label}
+                  </Link>
+                )
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center nav-actions">
+
+              {session?.user ? (
+                <DropdownMenu modal={false}>
+
+                  <DropdownMenuTrigger asChild className="dropdown-menu-trigger">
+                    <Avatar className="h-10 w-10 mx-4 cursor-pointer avatar flex items-center justify-center">
+
+                      <AvatarImage src={session?.user?.image ?? "/placeholder.svg"} />
+
+                      <AvatarFallback>
+                        {session?.user?.name?.charAt(0) ?? "U"}
+                      </AvatarFallback>
+
+                    </Avatar>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end" sideOffset={8} alignOffset={-4}>
+
+                    {session.user.role === "admin" && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/system">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Hệ Thống
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+
                     <DropdownMenuItem asChild>
-                      <Link href="/system">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Hệ Thống
+                      <Link href="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        Hồ Sơ
                       </Link>
                     </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile"><User className="mr-2 h-4 w-4" /> Hồ Sơ</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/watchlist"><Heart className="mr-2 h-4 w-4" /> Xem Sau</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-                    <LogOut className="mr-2 h-4 w-4" /> Đăng Xuất
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="hidden md:flex items-center space-x-2 mr-4">
-                <Link href="/login"><Button variant="ghost">Đăng Nhập</Button></Link>
-                <Link href="/register"><Button>Đăng Ký</Button></Link>
-              </div>
-            )}
 
-            {/* Mobile menu toggle */}
-            <Button variant="ghost" size="icon" className="md:hidden mobile-menu-toggle" onClick={() => setIsMenuOpen(prev => !prev)}>
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+                    <DropdownMenuItem asChild>
+                      <Link href="/watchlist">
+                        <Heart className="mr-2 h-4 w-4" />
+                        Xem Sau
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Đăng Xuất
+                    </DropdownMenuItem>
+
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+              ) : (
+                <div className="hidden md:flex items-center space-x-2 mr-4">
+                  <Link href="/login">
+                    <Button variant="ghost">Đăng Nhập</Button>
+                  </Link>
+
+                  <Link href="/register">
+                    <Button>Đăng Ký</Button>
+                  </Link>
+                </div>
+              )}
+
+              {/* Mobile menu toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden mobile-menu-toggle"
+                onClick={() => setIsMenuOpen(prev => !prev)}
+              >
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden fixed top-16 left-0 w-full bg-black/95 backdrop-blur-md flex flex-col space-y-2 py-4 px-4 border-t border-gray-800">
+
+              {navLinks.map((item, i) =>
+                item.popup ? (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setShowPopup(true)
+                      setIsMenuOpen(false)
+                    }}
+                    className="text-left px-2"
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  <Link
+                    key={i}
+                    href={item.href!}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="px-2"
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
+
+            </div>
+          )}
         </div>
+      </nav>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden fixed top-16 left-0 w-full bg-black/95 backdrop-blur-md flex flex-col space-y-2 py-4 px-4 border-t border-gray-800">
-            {navLinks.map(({ href, label }) => (
-              <Link key={href} href={href} onClick={() => setIsMenuOpen(false)} className="px-2">
-                {label}
-              </Link>
-            ))}
-            {session?.user ? (
-              <>
-                {session.user.role === "admin" && (
-                  <Link href="/system"><Button variant="ghost" className="w-full" onClick={closeMenu}>Hệ Thống</Button></Link>
-                )}
-                <Link href="/profile"><Button variant="ghost" className="w-full" onClick={closeMenu}>Hồ Sơ</Button></Link>
-                <Link href="/watchlist"><Button variant="ghost" className="w-full" onClick={closeMenu}>Xem Sau</Button></Link>
-                <Button onClick={() => signOut()} className="w-full" variant="destructive">Đăng Xuất</Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login"><Button variant="ghost" className="w-full" onClick={closeMenu}>Đăng Nhập</Button></Link>
-                <Link href="/register"><Button className="w-full" onClick={closeMenu}>Đăng Ký</Button></Link>
-              </>
-            )}
+      {/* Popup */}
+      {showPopup && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[2000]"
+          onClick={() => setShowPopup(false)}
+        >
+
+          <div
+            className="relative bg-black rounded-xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <button
+              className="absolute top-2 right-2 text-white text-xl"
+              onClick={() => setShowPopup(false)}
+            >
+              ✕
+            </button>
+
+            <Image
+              src="/bac.jpg"
+              alt="Bác"
+              width={400}
+              height={400}
+              className="rounded-lg"
+            />
+
           </div>
-        )}
-      </div>
-    </nav>
+
+        </div>
+      )}
+    </>
   )
 }
