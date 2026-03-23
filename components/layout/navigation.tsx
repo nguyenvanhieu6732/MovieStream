@@ -86,7 +86,7 @@ export function Navigation() {
   }
 
   const navLinks = [
-    { label: "Bác?", popup: true },
+    { label: "❤️", popup: true },
     { href: "/movies?movieSlug=tv-show", label: "tv-show" },
     { href: "/movies?movieSlug=phim-le", label: "Phim Lẻ" },
     { href: "/movies?movieSlug=phim-bo", label: "Phim Bộ" },
@@ -290,7 +290,7 @@ export function Navigation() {
 
             <Image
               src="/bac.jpg"
-              alt="Bác"
+              alt="❤️"
               width={400}
               height={400}
               className="rounded-lg"
