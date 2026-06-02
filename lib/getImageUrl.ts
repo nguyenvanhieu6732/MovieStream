@@ -1,5 +1,14 @@
- export const getImageUrl = (url: string) => {
-    if (!url) return "/placeholder.svg"
-    if (url.startsWith("http")) return url
-    return `https://img.ophim1.com/uploads/movies/${url}`
-  }
+const OPHIM_IMAGE_CDN = "https://img.ophim.live"
+
+export const getImageUrl = (url?: string | null) => {
+  if (!url) return "/placeholder.svg"
+
+  const value = url.trim()
+  if (!value) return "/placeholder.svg"
+
+  if (/^https?:\/\//i.test(value)) return value
+  if (value.startsWith("//")) return `https:${value}`
+  if (value.startsWith("/")) return `${OPHIM_IMAGE_CDN}${value}`
+
+  return `${OPHIM_IMAGE_CDN}/uploads/movies/${value}`
+}

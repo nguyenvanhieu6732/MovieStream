@@ -9,11 +9,11 @@ import { Play, Star, Ticket } from "lucide-react";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import CommentSection from "@/components/detailMovie/comment-section";
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { LoadingEffect } from "@/components/effect/loading-effect";
 import { useSession } from "next-auth/react";
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 export default function WatchPage({ params }: { params: { slug: string } }) {
   const { slug } = useParams();
@@ -109,23 +109,24 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
   const descriptionText = extractTextFromHtml(movie.content);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-6">
         <div className="text-xl font-semibold mb-4 mt-16">
           Xem phim {movie.name} - Tập {currentEpisodeName}
         </div>
 
         {/* Video player */}
-        <Card className="mb-6 bg-black border-gray-800">
+        <Card className="mb-6">
           <div className="aspect-video relative rounded-md overflow-hidden">
 
             {!isPlaying ? (
               /* ================= POSTER ================= */
               <div className="aspect-video relative">
-                <Image
-                  src={movie.poster_url}
+                <ImageWithLoader
+                  src={getImageUrl(movie.poster_url)}
                   alt={`Poster ${movie.name}`}
                   fill
+                  sizes="100vw"
                   className="object-cover brightness-75"
                 />
 
@@ -191,7 +192,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main content */}
           <div className="lg:col-span-2">
-            <Card className="mb-6 bg-gray-900 border-gray-800">
+            <Card className="mb-6">
               <CardContent className="p-6">
                 <h1 className="text-2xl font-bold mb-4">{movie.name}</h1>
                 <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-300">
@@ -248,7 +249,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
             </Card>
 
             {episodeList.length > 0 && (
-              <Card className="bg-gray-900 border-gray-800">
+              <Card>
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4">Danh sách tập</h3>
                   <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
@@ -276,7 +277,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
           {/* Sidebar: Gợi ý phim */}
           <div className="lg:col-span-1">
-            <Card className="bg-gray-900 border-gray-800">
+            <Card>
               <CardContent className="p-4">
                 <h3 className="text-xl font-semibold mb-4">Gợi ý phim</h3>
                 <div className="space-y-4">
@@ -284,14 +285,16 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                     <Link
                       key={item.slug}
                       href={`/watch/${item.slug}`}
+                      prefetch={false}
                       className="block group"
                     >
-                      <div className="flex gap-3 hover:bg-gray-800 p-2 rounded-lg transition">
+                      <div className="flex gap-3 hover:bg-white/10 p-2 rounded-lg transition">
                         <div className="relative w-20 h-[120px] rounded overflow-hidden">
-                          <Image
+                          <ImageWithLoader
                             src={getImageUrl(item.thumb_url)}
                             alt={item.name}
                             fill
+                            sizes="80px"
                             className="object-cover"
                           />
                         </div>

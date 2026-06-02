@@ -33,7 +33,7 @@ export default async function HomePageServer() {
   const auMyMovies = results[3].status === "fulfilled" ? results[3].value : [];
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen">
       <MovieSlider movies={featuredMovies} />
 
       <MovieHorizontalSlider

@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LoadingEffect } from "@/components/effect/loading-effect";
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -276,10 +276,10 @@ export default function ProfilePage() {
   }, [status, router]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-4 mt-16">
+    <div className="min-h-screen text-white py-4 mt-16">
       <div className="max-w-5xl mx-auto px-4">
         {/* Profile Card */}
-        <Card className="p-6 bg-card">
+        <Card className="p-6">
           <h1 className="text-2xl font-bold mb-6">
             Tài khoản của tôi -{" "}
             <span className={isPremium ? "text-green-400 font-semibold" : "text-yellow-300 font-semibold"}>
@@ -291,9 +291,11 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 relative rounded-full overflow-hidden bg-neutral-700">
                 {avatarUrl ? (
-                  <img
+                  <ImageWithLoader
                     src={getImageUrl(avatarUrl)}
                     alt="avatar"
+                    fill
+                    sizes="128px"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -335,7 +337,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Premium Card */}
-        <Card className="mt-4 p-6 bg-card">
+        <Card className="mt-4 p-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">Nâng cấp tài khoản</h2>
             <div className="text-sm">
@@ -362,7 +364,7 @@ export default function ProfilePage() {
                   <div>Chưa có gói nào.</div>
                 ) : (
                   plans.map((p) => (
-                    <div key={p.id} className="border bg-gradient-to-r from-indigo-500 to-purple-500 rounded p-4">
+                    <div key={p.id} className="glass-card rounded p-4">
                       <div className="flex justify-between items-start">
                         <div>
                           <div className="text-lg font-semibold">{p.name}</div>
@@ -391,7 +393,7 @@ export default function ProfilePage() {
         </Card>
 
         {isPremium && role === "owner" && (currentPlan?.maxMembers ?? premiumInfo?.plan?.maxMembers ?? 1) > 1 && (
-          <Card className="mt-4 p-6 bg-card">
+          <Card className="mt-4 p-6">
             <h2 className="text-xl font-bold mb-4">Chia sẻ gói Premium</h2>
             <div>
               <p className="text-sm">Bạn đang có gói: <strong>{currentPlan?.name ?? premiumInfo?.plan?.name ?? premiumInfo?.planKey}</strong></p>

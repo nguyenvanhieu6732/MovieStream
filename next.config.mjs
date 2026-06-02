@@ -28,10 +28,13 @@ const nextConfig = {
   },
 
   images: {
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
     remotePatterns: [
       { protocol: 'https', hostname: 'img.ophim.live' },
       { protocol: 'https', hostname: 'img.ophim1.com' },
+      { protocol: 'https', hostname: 'ophim1.com' },
+      { protocol: 'https', hostname: 'ophim.cc' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'scontent.fhan15-2.fna.fbcdn.net' },

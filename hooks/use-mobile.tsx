@@ -16,17 +16,18 @@ export function useDeviceType(): DeviceType | null {
   useEffect(() => {
     function updateDevice() {
       const width = window.innerWidth
-      if (width < BREAKPOINTS.mobile) {
-        setDevice("mobile")
-      } else if (width < BREAKPOINTS.tablet) {
-        setDevice("tablet")
-      } else {
-        setDevice("desktop")
-      }
+      const nextDevice =
+        width < BREAKPOINTS.mobile
+          ? "mobile"
+          : width < BREAKPOINTS.tablet
+            ? "tablet"
+            : "desktop"
+
+      setDevice((current) => (current === nextDevice ? current : nextDevice))
     }
 
     updateDevice()
-    window.addEventListener("resize", updateDevice)
+    window.addEventListener("resize", updateDevice, { passive: true })
     return () => window.removeEventListener("resize", updateDevice)
   }, [])
 

@@ -1,46 +1,39 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
 import { useDeviceType } from "@/hooks/use-mobile";
+import Image from "next/image";
 
 
 export default function SplashProvider({ children }: { children: React.ReactNode }) {
   const [hideSplash, setHideSplash] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
   const device = useDeviceType();
   useEffect(() => {
     // Scroll về đầu trang khi hiển thị splash
     window.scrollTo(0, 0)
 
     const timer = setTimeout(() => {
-      setHideSplash(true)
+      setIsExiting(true)
     }, 2000)
 
-    return () => clearTimeout(timer)
+    const removeTimer = setTimeout(() => {
+      setHideSplash(true)
+    }, 2700)
+
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(removeTimer)
+    }
   }, [])
 
   return (
     <div className="relative">
       {children}
 
-      <AnimatePresence>
-        {!hideSplash && (
-          <motion.div
-            key="splash"
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black pointer-events-none"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 px-4 text-center md:text-left"
-            >
+      {!hideSplash && (
+        <div className={`splash-screen fixed inset-0 z-[9999] flex items-center justify-center bg-black pointer-events-none ${isExiting ? "splash-screen-exit" : ""}`}>
+            <div className="splash-content flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 px-4 text-center md:text-left">
               {/* Logo */}
               <Image
                 src="/logo.png"
@@ -68,10 +61,9 @@ export default function SplashProvider({ children }: { children: React.ReactNode
                 )}
 
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+        </div>
+      )}
     </div>
   )
 }

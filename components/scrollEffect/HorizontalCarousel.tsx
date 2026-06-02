@@ -1,7 +1,6 @@
 // components/carousel/HorizontalCarousel.tsx
 "use client";
 import useEmblaCarousel from "embla-carousel-react";
-import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useDeviceType } from "@/hooks/use-mobile";
 
@@ -22,15 +21,11 @@ export default function HorizontalCarousel({
     align: "start",
     dragFree: true,
   });
-  const [isReady, setIsReady] = useState(false);
   const device = useDeviceType();
-  useEffect(() => {
-    if (emblaApi) setIsReady(true);
-  }, [emblaApi]);
 
   return (
     <div className="relative w-full overflow-hidden">
-      {isReady && device === "desktop" && (
+      {emblaApi && device === "desktop" && (
         <>
           {/* Chevron trái */}
           <div className="absolute left-0 top-0 bottom-0 w-12 z-20 flex items-center">

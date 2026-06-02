@@ -41,7 +41,7 @@ export default function MovieCarousel({
   const itemWidth = `calc((100% - ${(itemsPerRow - 1) * gap}px) / ${itemsPerRow})`;
 
   return (
-    <div className="relative mx-auto px-2 py-4">
+    <div className="content-visibility-auto relative mx-auto px-2 py-4">
       {title && (
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl">{title}</h2>
@@ -76,13 +76,13 @@ export default function MovieCarousel({
         <>
           <button
             onClick={scrollPrev}
-            className="absolute top-1/2 left-0 -translate-y-1/2 bg-white text-black p-2 rounded-full transition"
+            className="glass-panel absolute top-1/2 left-0 -translate-y-1/2 p-2 rounded-full text-white transition hover:bg-white/15"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={scrollNext}
-            className="absolute top-1/2 right-0 -translate-y-1/2 bg-white text-black p-2 rounded-full transition"
+            className="glass-panel absolute top-1/2 right-0 -translate-y-1/2 p-2 rounded-full text-white transition hover:bg-white/15"
           >
             <ChevronRight className="w-6 h-6" />
           </button>

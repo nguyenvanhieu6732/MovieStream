@@ -1,13 +1,13 @@
 // components/MovieHorizontalSlider.tsx
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { OPhimMovie } from "@/lib/interface";
 import { getImageUrl } from "@/lib/getImageUrl";
 import SectionHeader from "./SectionHeader";
 import HorizontalCarousel from "../scrollEffect/HorizontalCarousel";
 import { ChevronRight } from "lucide-react";
 import { useDeviceType } from "@/hooks/use-mobile";
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 
 interface Props {
@@ -32,25 +32,27 @@ export default function MovieHorizontalSlider({
     <Link
       key={movie._id}
       href={`/movie/${movie.slug}`}
+      prefetch={false}
       onClick={handleClick}
-      className="group relative block rounded-md overflow-hidden bg-black transition-all duration-300 hover:shadow-xl"
+      className="glass-card group relative block overflow-hidden rounded-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       <div className="relative w-full h-[220px] overflow-hidden">
-        <Image
+        <ImageWithLoader
           src={getImageUrl(movie.poster_url)}
           alt={movie.name}
           fill
           className="object-cover transition-transform duration-300 ease-in-out 
                      group-hover:scale-105 group-hover:brightness-75"
           loading="lazy"
+          sizes="(max-width: 640px) 100vw, 380px"
         />
         {movie.episode_current && (
-          <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+          <span className="glass-panel absolute bottom-2 left-2 text-white text-xs px-2 py-1 rounded">
             {movie.episode_current}
           </span>
         )}
         {movie.lang && (
-          <span className="absolute bottom-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+          <span className="absolute bottom-2 right-2 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded">
             {movie.lang}
           </span>
         )}

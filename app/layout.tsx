@@ -3,17 +3,20 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/layout/theme-provider"
-import Footer from "@/components/layout/footer"
-import { Navigation } from "@/components/layout/navigation"
 import SplashProvider from "@/components/effect/SplashProvider"
 import AuthProvider from "@/providers/session-provider"
 import { Toaster } from "sonner"  // ✅ Thêm
 import HeaderWrapper from "@/components/layout/HeaderWrapper"
 import FooterWrapper from "@/components/layout/FooterWrapper"
+import PageTransition from "@/components/layout/PageTransition"
 
 const inter = Inter({ subsets: ["latin"] })
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "MovieStream",
   description: "Stream the latest movies and TV shows online.",
   openGraph: {
@@ -36,7 +39,7 @@ export default function RootLayout({
           <AuthProvider>
             <SplashProvider>
               <HeaderWrapper />
-              {children}
+              <PageTransition>{children}</PageTransition>
               <FooterWrapper />
               <Toaster richColors position="top-center" />
             </SplashProvider>

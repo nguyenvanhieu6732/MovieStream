@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
 import { OPhimMovie } from "@/lib/interface";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { useDeviceType } from "@/hooks/use-mobile";
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 interface Props {
   movie: OPhimMovie;
@@ -18,11 +18,11 @@ function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
   return (
     <Link
       href={`/movie/${movie.slug}`}
-      prefetch={true}
-      className="group block rounded-lg overflow-hidden shadow hover:shadow-lg transition relative"
+      prefetch={false}
+      className="glass-card group block overflow-hidden rounded-lg shadow hover:-translate-y-1 hover:shadow-lg transition relative"
     >
       <div className={`relative w-full ${aspectClass}`}>
-        <Image
+        <ImageWithLoader
           src={getImageUrl(
             variant === "thumbnail" ? movie.thumb_url : movie.poster_url
           )}
@@ -35,12 +35,12 @@ function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
           loading="lazy"
         />
         {movie.episode_current && (
-          <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded line-clamp-1">
+          <span className="glass-panel absolute bottom-2 left-2 text-white text-xs px-2 py-0.5 rounded line-clamp-1">
             {movie.episode_current}
           </span>
         )}
         {movie.lang && (
-          <span className="absolute bottom-2 right-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded line-clamp-1">
+          <span className="absolute bottom-2 right-2 bg-emerald-500/90 text-white text-xs px-2 py-0.5 rounded line-clamp-1">
             {movie.lang}
           </span>
         )}

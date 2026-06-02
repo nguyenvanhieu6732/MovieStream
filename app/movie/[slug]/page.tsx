@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Calendar, Clock, Play, Share2, Star, Ticket } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { ErrorBoundary } from "react-error-boundary";
@@ -18,6 +17,7 @@ import { getImageUrl } from "@/lib/getImageUrl";
 import { useSession } from "next-auth/react";
 import confirmToast from "@/lib/confirmToast";
 import { toast } from "sonner"
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 
 
@@ -32,7 +32,7 @@ interface Episode {
 }
 
 const FallbackComponent = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
-  <div className="min-h-screen bg-black flex items-center justify-center">
+  <div className="min-h-screen flex items-center justify-center">
     <Card className="p-6">
       <p className="text-red-600">Có lỗi xảy ra: {error.message}</p>
       <Button onClick={resetErrorBoundary} className="mt-4">Thử lại</Button>
@@ -232,7 +232,7 @@ async function doTogglePremium() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="p-6">
           <p className="text-red-600">{error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">Thử lại</Button>
@@ -245,7 +245,7 @@ async function doTogglePremium() {
 
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen">
         <Head>
           <title>{movie.name} - Xem phim online</title>
           <meta name="description" content={descriptionText.slice(0, 160)} />
@@ -255,7 +255,7 @@ async function doTogglePremium() {
         </Head>
 
         <div className="relative h-[60vh] overflow-hidden">
-          <Image src={getImageUrl(movie.poster_url)} alt={`${movie.name} poster`} fill sizes="100vw" priority placeholder="blur" blurDataURL="/low-res-poster.jpg" className="object-cover" />
+          <ImageWithLoader src={getImageUrl(movie.poster_url)} alt={`${movie.name} poster`} fill sizes="100vw" priority className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
 
@@ -264,12 +264,12 @@ async function doTogglePremium() {
             <div>
               <Card>
                 <div className="aspect-[2/3] relative">
-                  <Image src={getImageUrl(movie.thumb_url)} alt={`${movie.name} thumbnail`} fill sizes="(max-width: 1024px) 100vw, 33vw" loading="lazy" placeholder="blur" blurDataURL="/low-res-thumb.jpg" className="object-cover" />
+                  <ImageWithLoader src={getImageUrl(movie.thumb_url)} alt={`${movie.name} thumbnail`} fill sizes="(max-width: 1024px) 100vw, 33vw" loading="lazy" className="object-cover" />
                 </div>
               </Card>
             </div>
 
-            <div className="lg:col-span-2 bg-card rounded-lg p-6">
+            <div className="glass-card lg:col-span-2 rounded-lg p-6">
               <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
                 {movie.name}
 

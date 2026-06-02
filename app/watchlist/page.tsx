@@ -43,13 +43,11 @@ export default function WatchlistPage() {
           return;
         }
 
-        const fetchedMovies: OPhimMovie[] = [];
-        for (const item of list) {
-          const movie = await fetchMovieBySlug(item.movieId);
-          if (movie) fetchedMovies.push(movie);
-        }
+        const fetchedMovies = await Promise.all(
+          list.map((item: { movieId: string }) => fetchMovieBySlug(item.movieId))
+        );
 
-        setMovies(fetchedMovies);
+        setMovies(fetchedMovies.filter((movie): movie is OPhimMovie => Boolean(movie)));
       } catch (err) {
         console.error("Lỗi lấy watchlist:", err);
         toast.error("Lấy danh sách thất bại");

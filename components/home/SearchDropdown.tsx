@@ -1,7 +1,7 @@
 import Link from "next/link"
-import Image from "next/image"
 import { OPhimMovie } from "@/lib/interface"
 import { getImageUrl } from "@/lib/getImageUrl"
+import { ImageWithLoader } from "@/components/ui/image-with-loader"
 
 export function SearchDropdown({
   results,
@@ -19,15 +19,16 @@ export function SearchDropdown({
           onClick={onClose}
           className="flex items-center px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 gap-3"
         >
-          <Image
-            src={getImageUrl(movie.thumb_url)}
-            alt={movie.name}
-            width={48}
-            height={64}
-            className="object-cover rounded"
-            loading="lazy"
-            unoptimized
-          />
+          <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded">
+            <ImageWithLoader
+              src={getImageUrl(movie.thumb_url)}
+              alt={movie.name}
+              fill
+              sizes="48px"
+              className="object-cover rounded"
+              loading="lazy"
+            />
+          </div>
           <div className="flex flex-col">
             <span className="text-sm font-medium">{movie.name}</span>
             <span className="text-xs text-muted-foreground">{movie.year}</span>

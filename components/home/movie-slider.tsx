@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { OPhimMovie } from "@/lib/interface";
 import { useDeviceType } from "@/hooks/use-mobile";
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 interface MovieSliderProps {
   movies: OPhimMovie[];
@@ -20,14 +20,14 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const device = useDeviceType();
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
   useEffect(() => {
     if (!emblaApi) return;
     const updateIndex = () => setSelectedIndex(emblaApi.selectedScrollSnap());
     emblaApi.on("select", updateIndex);
     updateIndex();
+    return () => {
+      emblaApi.off("select", updateIndex);
+    };
   }, [emblaApi]);
 
   useEffect(() => {
@@ -38,10 +38,6 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
     return () => clearInterval(interval);
   }, [emblaApi]);
 
-  if (!mounted) {
-    return null;
-  }
-
   return (
     <section className="relative aspect-[16/9] md:h-[100vh] w-full overflow-hidden">
       <div className="overflow-hidden h-full" ref={emblaRef}>
@@ -51,11 +47,12 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
               key={movie._id}
               className="min-w-full relative h-full flex-shrink-0"
             >
-              <Link href={device === "mobile" ? `/movie/${movie.slug}` : "#"}>
-                <Image
+              <div>
+                <ImageWithLoader
                   src={getImageUrl(movie.poster_url)}
                   alt={movie.name}
                   fill
+                  wrapperClassName="absolute inset-0"
                   className="object-cover"
                   sizes="100vw"
                   priority={index === 0}
@@ -66,8 +63,16 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                   <div className="absolute inset-0 bg-black/20" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/40 to-transparent" />
                 </div>
+                {device === "mobile" && (
+                  <Link
+                    href={`/movie/${movie.slug}`}
+                    prefetch={false}
+                    className="absolute inset-0 z-20"
+                    aria-label={`Xem chi tiết ${movie.name}`}
+                  />
+                )}
 
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-16 z-20">
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-16 z-30">
                   <div className="max-w-md sm:max-w-xl md:max-w-3xl space-y-2 sm:space-y-3 md:space-y-5">
                     {device === "mobile" ? (
                       <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow">
@@ -90,7 +95,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                           ))}
                         </div>
                         <div className="flex flex-wrap gap-2 sm:gap-3 pt-2">
-                          <Link href={`/watch/${movie.slug}`}>
+                          <Link href={`/watch/${movie.slug}`} prefetch={false}>
                             <Button
                               size="sm"
                               className="bg-red-600 hover:bg-red-700 text-white shadow-md sm:size-md md:size-lg"
@@ -99,7 +104,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                               Xem ngay
                             </Button>
                           </Link>
-                          <Link href={`/movie/${movie.slug}`}>
+                          <Link href={`/movie/${movie.slug}`} prefetch={false}>
                             <Button
                               size="sm"
                               variant="outline"
@@ -113,7 +118,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                     )}
                   </div>
                 </div>
-              </Link>
+              </div>
             </div>
           ))}
         </div>

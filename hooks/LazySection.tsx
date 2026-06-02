@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import MovieCarousel from "@/components/scrollEffect/MovieCarousel";
 import { OPhimMovie } from "@/lib/interface";
@@ -18,16 +18,19 @@ interface CarouselConfig {
 }
 
 export default function LazyCarousels({ carousels }: { carousels: CarouselConfig[] }) {
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1, rootMargin: "300px" });
   const [moviesData, setMoviesData] = useState<Record<string, OPhimMovie[]>>({});
   const [loading, setLoading] = useState(false);
+  const hasRequested = useRef(false);
 
   useEffect(() => {
-    if (inView && Object.keys(moviesData).length === 0 && !loading) {
+    if (inView && !hasRequested.current) {
+      hasRequested.current = true;
+      const controller = new AbortController();
       setLoading(true);
       Promise.all(
         carousels.map(c =>
-          fetch(c.url, { cache: 'force-cache' }) // Sử dụng cache trình duyệt
+          fetch(c.url, { cache: 'force-cache', signal: controller.signal })
             .then(res => {
               if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
               return res.json();
@@ -42,10 +45,19 @@ export default function LazyCarousels({ carousels }: { carousels: CarouselConfig
           });
           setMoviesData(map);
         })
-        .catch(err => console.error(err))
-        .finally(() => setLoading(false));
+        .catch(err => {
+          if (!controller.signal.aborted) {
+            console.error(err);
+            hasRequested.current = false;
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setLoading(false);
+        });
+
+      return () => controller.abort();
     }
-  }, [inView, carousels, moviesData, loading]);
+  }, [inView, carousels]);
   const device = useDeviceType();
 
   return (

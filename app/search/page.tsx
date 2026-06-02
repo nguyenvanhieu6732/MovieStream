@@ -27,6 +27,8 @@ export default function SearchPage() {
 
   // Gọi API khi debounced query thay đổi
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchData = async () => {
       if (!debouncedSearchQuery.trim()) {
         setResults([])
@@ -36,7 +38,8 @@ export default function SearchPage() {
       setLoading(true)
       try {
         const res = await fetch(
-          `https://ophim1.com/v1/api/tim-kiem?keyword=${encodeURIComponent(debouncedSearchQuery)}`
+          `https://ophim1.com/v1/api/tim-kiem?keyword=${encodeURIComponent(debouncedSearchQuery)}`,
+          { signal: controller.signal }
         )
         const json = await res.json()
         if (json.status && Array.isArray(json.data?.items)) {
@@ -45,6 +48,7 @@ export default function SearchPage() {
           setResults([])
         }
       } catch (error) {
+        if (controller.signal.aborted) return
         console.error("Lỗi tìm kiếm:", error)
         setResults([])
       } finally {
@@ -53,6 +57,7 @@ export default function SearchPage() {
     }
 
     fetchData()
+    return () => controller.abort()
   }, [debouncedSearchQuery])
 
   const handleSearch = (e: React.FormEvent) => {

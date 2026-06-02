@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation"
 import Footer from "./footer"
 
-export default function HeaderWrapper() {
+export default function FooterWrapper() {
   const pathname = usePathname()
   const isSystem = pathname.startsWith("/system")
 
