@@ -218,35 +218,63 @@ export function Navigation() {
               </Button>
             </div>
           </div>
-
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="glass-panel fixed left-3 right-3 top-[88px] flex flex-col space-y-2 rounded-[1.75rem] p-4 md:hidden"
-            >
-              {navLinks.map((item, i) =>
-                item.popup ? (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setShowPopup(true)
-                      setIsMenuOpen(false)
-                    }}
-                    className="rounded-2xl px-3 py-2 text-left text-white/82 hover:bg-white/10"
-                  >
-                    {item.label}
-                  </button>
-                ) : (
-                  <Link key={i} href={item.href!} onClick={() => setIsMenuOpen(false)} className="rounded-2xl px-3 py-2 text-white/82 hover:bg-white/10">
-                    {item.label}
-                  </Link>
-                )
-              )}
-            </motion.div>
-          )}
         </div>
       </motion.nav>
+
+      {isMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 180, damping: 22 }}
+          className="glass-panel fixed left-4 right-4 top-[96px] z-[1200] flex max-h-[calc(100dvh-120px)] flex-col gap-2 overflow-y-auto rounded-[1.75rem] p-4 text-white shadow-[0_28px_90px_rgba(0,0,0,0.5)] md:hidden"
+        >
+          <form onSubmit={handleSearch} className="relative mb-2">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/54" />
+            <Input
+              type="search"
+              placeholder="Tìm kiếm phim..."
+              className="h-11 rounded-[1.4rem] pl-11"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
+
+          {navLinks.map((item, i) =>
+            item.popup ? (
+              <button
+                key={i}
+                onClick={() => {
+                  setShowPopup(true)
+                  setIsMenuOpen(false)
+                }}
+                className="rounded-2xl px-4 py-3 text-left text-sm font-medium text-white/82 hover:bg-white/10"
+              >
+                {item.label}
+              </button>
+            ) : (
+              <Link
+                key={i}
+                href={item.href!}
+                onClick={() => setIsMenuOpen(false)}
+                className="rounded-2xl px-4 py-3 text-sm font-medium text-white/82 hover:bg-white/10"
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+
+          {!session?.user && (
+            <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/10 pt-3">
+              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="outline" className="w-full">Đăng Nhập</Button>
+              </Link>
+              <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                <Button className="w-full">Đăng Ký</Button>
+              </Link>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {showPopup && (
         <div

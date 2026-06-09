@@ -69,11 +69,11 @@ export default function MovieHorizontalSlider({
   ));
 
   return (
-    <section className="relative mb-8 mt-14 px-4 md:px-8">
+    <section className="relative mb-8 mt-9 px-4 md:mt-14 md:px-8">
       {device == "mobile" ? (
         <>
           {/* Mobile layout */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between gap-3">
             <SectionHeader
               country={country || "mới"}
               movieSlug={movieSlug}

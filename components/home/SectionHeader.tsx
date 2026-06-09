@@ -9,6 +9,17 @@ export default function SectionHeader({
   title = "Phim",
 }: SectionHeaderProps) {
   const device = useDeviceType();
+
+  if (device === "mobile") {
+    return (
+      <div className="min-w-0 flex-1">
+        <h2 className="line-clamp-2 text-2xl font-semibold leading-tight tracking-tight text-white" title={`${title} mới`}>
+          {title} mới
+        </h2>
+      </div>
+    )
+  }
+
   return (
     <div className="glass-panel flex h-full min-h-[132px] flex-col justify-between rounded-[1.75rem] p-5">
       <span className="text-xs font-medium text-white/46"></span>
