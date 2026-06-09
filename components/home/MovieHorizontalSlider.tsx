@@ -34,34 +34,34 @@ export default function MovieHorizontalSlider({
       href={`/movie/${movie.slug}`}
       prefetch={false}
       onClick={handleClick}
-      className="glass-card group relative block overflow-hidden rounded-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="glass-card glass-hover group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] transition"
     >
-      <div className="relative w-full h-[220px] overflow-hidden">
+      <div className="relative h-[220px] w-full overflow-hidden rounded-t-[1.7rem]">
         <ImageWithLoader
           src={getImageUrl(movie.poster_url)}
           alt={movie.name}
           fill
-          className="object-cover transition-transform duration-300 ease-in-out 
-                     group-hover:scale-105 group-hover:brightness-75"
+          className="object-cover transition duration-500 ease-out 
+                     group-hover:scale-105 group-hover:brightness-90"
           loading="lazy"
           sizes="(max-width: 640px) 100vw, 380px"
         />
         {movie.episode_current && (
-          <span className="glass-panel absolute bottom-2 left-2 text-white text-xs px-2 py-1 rounded">
+          <span className="glass-panel absolute left-4 top-4 max-w-[58%] rounded-full px-3 py-1.5 text-xs font-medium text-white shadow-[0_10px_28px_rgba(0,0,0,0.35)] line-clamp-1">
             {movie.episode_current}
           </span>
         )}
         {movie.lang && (
-          <span className="absolute bottom-2 right-2 bg-emerald-500/90 text-white text-xs px-2 py-1 rounded">
+          <span className="absolute bottom-4 right-4 max-w-[42%] rounded-full border border-white/14 bg-black/36 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-xl line-clamp-1">
             {movie.lang}
           </span>
         )}
       </div>
-      <div className="p-3">
-        <h3 className="text-base font-semibold text-foreground line-clamp-2">
+      <div className="min-w-0 flex-1 p-4">
+        <h3 className="truncate text-base font-semibold leading-snug text-white" title={movie.name}>
           {movie.name}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-1">
+        <p className="mt-1 truncate text-sm text-white/48" title={movie.origin_name}>
           {movie.origin_name}
         </p>
       </div>
@@ -69,11 +69,11 @@ export default function MovieHorizontalSlider({
   ));
 
   return (
-<section className="relative mb-6 px-4 md:px-8 mt-12">
+    <section className="relative mb-8 mt-14 px-4 md:px-8">
       {device == "mobile" ? (
         <>
           {/* Mobile layout */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-4 flex items-center justify-between">
             <SectionHeader
               country={country || "mới"}
               movieSlug={movieSlug}
@@ -87,7 +87,7 @@ export default function MovieHorizontalSlider({
                   ? `/movies?country=${encodeURIComponent(country)}`
                   : `/movies?movieSlug=${encodeURIComponent(movieSlug || "")}`
               }
-              className="text-sm text-white/90 hover:underline inline-flex items-center gap-1"
+              className="glass-panel inline-flex h-10 w-10 items-center justify-center rounded-full text-white/82 hover:text-white"
             >
               <ChevronRight className="w-5 h-5" />
             </Link>
@@ -98,7 +98,7 @@ export default function MovieHorizontalSlider({
       ) : (
         <>
           {/* Desktop/Tablet layout */}
-          <div className="grid grid-cols-[200px_1fr] gap-4 items-stretch">
+          <div className="grid items-stretch gap-5 lg:grid-cols-[230px_1fr]">
             <SectionHeader
               country={country || "mới"}
               movieSlug={movieSlug}

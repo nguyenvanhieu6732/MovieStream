@@ -7,23 +7,22 @@ import Image from "next/image"
 
 export default function Footer() {
     return (
-        <footer className="glass-panel text-gray-300 pt-12 pb-6 relative border-t border-white/10">
-            <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
-                {/* Logo + Slogan */}
+        <footer className="relative px-4 pb-8 pt-16 text-gray-300">
+            <div className="glass-panel spatial-container rounded-[2rem] px-6 py-10 md:px-10">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
                 <div>
-                    <div className="flex items-center space-x-2 mb-3">
-                        <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
-                        <span className="text-xl font-bold">MovieStream</span>
+                    <div className="mb-4 flex items-center gap-3">
+                        <Image src="/logo.png" alt="MovieStream Logo" width={54} height={54} className="rounded-2xl" />
+                        <span className="text-xl font-semibold tracking-tight text-white">MovieStream</span>
                     </div>
-                    <p className="text-sm text-gray-400 leading-relaxed">
+                    <p className="max-w-sm text-sm leading-relaxed text-white/62">
                         Xem phim online miễn phí chất lượng cao, cập nhật liên tục. Giao diện đẹp, không quảng cáo, dễ dùng trên mọi thiết bị.
                     </p>
                 </div>
 
-                {/* Thể loại phổ biến */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Thể loại</h3>
-                    <ul className="space-y-2 text-sm">
+                    <h3 className="mb-3 text-sm font-semibold text-white/90">Thể loại</h3>
+                    <ul className="space-y-2 text-sm text-white/58">
                         <li><a href="/movies?movieSlug=hanh-dong" className="hover:text-white transition">Hành động</a></li>
                         <li><a href="/movies?movieSlug=tinh-cam" className="hover:text-white transition">Tình cảm</a></li>
                         <li><a href="/movies?movieSlug=kinh-di" className="hover:text-white transition">Kinh dị</a></li>
@@ -32,34 +31,31 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                {/* Thông tin */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Thông tin</h3>
-                    <ul className="space-y-2 text-sm">
-                        <li><a href="#" className="hover:text-white transition">Về chúng tôi</a></li>
-                        <li><a href="#" className="hover:text-white transition">Liên hệ</a></li>
-                        <li><a href="#" className="hover:text-white transition">Chính sách</a></li>
-                        <li><a href="#" className="hover:text-white transition">Báo lỗi phim</a></li>
+                    <h3 className="mb-3 text-sm font-semibold text-white/90">Thông tin</h3>
+                    <ul className="space-y-2 text-sm text-white/58">
+                        <li><a href="/search" className="hover:text-white transition">Tìm kiếm</a></li>
+                        <li><a href="/watchlist" className="hover:text-white transition">Xem sau</a></li>
+                        <li><a href="/profile" className="hover:text-white transition">Tài khoản</a></li>
+                        <li><a href="/movies?movieSlug=phim-chieu-rap" className="hover:text-white transition">Phim chiếu rạp</a></li>
                     </ul>
                 </div>
 
-                {/* Mạng xã hội */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Kết nối</h3>
-                    <div className="flex gap-4 mt-2">
-                        <a href="https://www.facebook.com/nguyenhieu.241967" className="hover:text-white"><Facebook size={20} /></a>
-                        <a href="https://www.instagram.com/im.hieu037/" className="hover:text-white"><Instagram size={20} /></a>
-                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="hover:text-white"><Youtube size={20} /></a>
+                    <h3 className="mb-3 text-sm font-semibold text-white/90">Kết nối</h3>
+                    <div className="mt-2 flex gap-3">
+                        <a href="https://www.facebook.com/nguyenhieu.241967" className="rounded-2xl border border-white/10 bg-white/5 p-3 text-white/62 hover:bg-white/10 hover:text-white" aria-label="Facebook"><Facebook size={19} /></a>
+                        <a href="https://www.instagram.com/im.hieu037/" className="rounded-2xl border border-white/10 bg-white/5 p-3 text-white/62 hover:bg-white/10 hover:text-white" aria-label="Instagram"><Instagram size={19} /></a>
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="rounded-2xl border border-white/10 bg-white/5 p-3 text-white/62 hover:bg-white/10 hover:text-white" aria-label="YouTube"><Youtube size={19} /></a>
                     </div>
                 </div>
             </div>
 
-            {/* Bottom */}
-            <div className="mt-10 border-t border-gray-700 pt-4 text-center text-sm text-gray-500">
+            <div className="mt-10 border-t border-white/10 pt-5 text-center text-sm text-white/42">
                 © {new Date().getFullYear()} MovieStream. Tất cả bản quyền thuộc về chúng tôi.
             </div>
+            </div>
 
-            {/* Scroll to top */}
             <ScrollToTopButton />
         </footer>
     )

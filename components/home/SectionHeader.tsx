@@ -6,23 +6,21 @@ import { useDeviceType } from "@/hooks/use-mobile";
 
 export default function SectionHeader({
   link = "#",
-  gradient = "from-purple-400 via-purple-500 to-white",
   title = "Phim",
 }: SectionHeaderProps) {
   const device = useDeviceType();
   return (
-    <div className="flex flex-col justify-center items-start gap-2">
-      <h2
-        className={`text-2xl font-extrabold bg-gradient-to-r ${gradient} bg-clip-text text-transparent leading-snug`}
-      >
+    <div className="glass-panel flex h-full min-h-[132px] flex-col justify-between rounded-[1.75rem] p-5">
+      <span className="text-xs font-medium text-white/46"></span>
+      <h2 className="line-clamp-3 text-2xl font-semibold leading-tight tracking-tight text-white" title={`${title} mới`}>
         {title} mới
       </h2>
       {device !== "mobile" && (
         <Link
           href={link}
-          className="text-sm text-white/90 hover:underline inline-flex items-center gap-1"
+          className="inline-flex items-center gap-2 text-sm font-medium text-white/62 hover:text-white"
         >
-          Xem toàn bộ <span>&rarr;</span>
+          Xem toàn bộ <span aria-hidden="true">&rarr;</span>
         </Link>
       )}
 

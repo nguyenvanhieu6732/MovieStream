@@ -41,15 +41,15 @@ export default function MovieCarousel({
   const itemWidth = `calc((100% - ${(itemsPerRow - 1) * gap}px) / ${itemsPerRow})`;
 
   return (
-    <div className="content-visibility-auto relative mx-auto px-2 py-4">
+    <div className="content-visibility-auto spatial-container relative px-1 py-4">
       {title && (
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl">{title}</h2>
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h2 className="text-balance text-2xl font-semibold tracking-tight md:text-3xl">{title}</h2>
 
           {seeAllLink && (
             <Link
               href={seeAllLink}
-              className="text-sm text-white/90 hover:underline inline-flex items-center gap-1 ml-4"
+              className="ml-4 inline-flex items-center gap-1 text-sm font-medium text-white/62 hover:text-white"
             >
               Xem toàn bộ <span>&rarr;</span>
             </Link>
@@ -59,10 +59,11 @@ export default function MovieCarousel({
 
       {/* Carousel viewport */}
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4">
+        <div className="flex items-stretch gap-4">
           {movies.map((movie) => (
             <div
               key={movie._id}
+              className="flex min-w-0"
               style={{ flex: `0 0 ${itemWidth}` }}
             >
               <MovieCard movie={movie} variant={layout} />

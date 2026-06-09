@@ -72,7 +72,7 @@ export default function ProfilePage() {
     if (!p) return;
 
     if (p === "success") {
-      toast.success("Thanh toán thành công! Gói đã được kích hoạt.");
+      toast.success("Thanh toán thành công. Gói đã được kích hoạt.");
     } else if (p === "failed") {
       toast.error("Thanh toán thất bại hoặc bị hủy.");
     } else if (p === "invalid") {
@@ -276,20 +276,19 @@ export default function ProfilePage() {
   }, [status, router]);
 
   return (
-    <div className="min-h-screen text-white py-4 mt-16">
-      <div className="max-w-5xl mx-auto px-4">
-        {/* Profile Card */}
-        <Card className="p-6">
-          <h1 className="text-2xl font-bold mb-6">
-            Tài khoản của tôi -{" "}
-            <span className={isPremium ? "text-green-400 font-semibold" : "text-yellow-300 font-semibold"}>
+    <div className="min-h-screen py-4 pt-32 text-white md:pt-36">
+      <div className="spatial-container max-w-6xl px-1">
+        <Card className="p-6 md:p-8">
+          <h1 className="mb-8 text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+            Tài khoản của tôi{" "}
+            <span className={isPremium ? "text-primary" : "text-white/52"}>
               {isPremium ? "Premium" : "Free"}
             </span>
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[240px_1fr]">
             <div className="flex flex-col items-center">
-              <div className="w-32 h-32 relative rounded-full overflow-hidden bg-neutral-700">
+              <div className="glass-panel relative h-36 w-36 overflow-hidden rounded-[2rem] bg-neutral-700">
                 {avatarUrl ? (
                   <ImageWithLoader
                     src={getImageUrl(avatarUrl)}
@@ -299,7 +298,7 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="flex items-center justify-center w-full h-full text-2xl font-bold text-white/80">
+                  <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-white/80">
                     {name?.charAt(0) ?? "U"}
                   </div>
                 )}
@@ -308,7 +307,7 @@ export default function ProfilePage() {
 
               <div className="mt-4 flex flex-col items-center gap-2">
                 {isRestrictedDomain() ? (
-                  <p className="text-sm text-gray-400">Ảnh đã được đồng bộ</p>
+                  <p className="text-sm text-white/52">Ảnh đã được đồng bộ</p>
                 ) : (
                   <div className="flex gap-2">
                     <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
@@ -323,12 +322,12 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <div className="mb-4">
                 <Label htmlFor="name">Họ và tên</Label>
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tên hiển thị" />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <Button onClick={handleSave} disabled={saving || status === "loading"}>{saving ? "Đang lưu..." : "Lưu thay đổi"}</Button>
                 <Button variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>Đăng xuất</Button>
               </div>
@@ -336,13 +335,12 @@ export default function ProfilePage() {
           </div>
         </Card>
 
-        {/* Premium Card */}
-        <Card className="mt-4 p-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold">Nâng cấp tài khoản</h2>
+        <Card className="mt-6 p-6 md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h2 className="text-2xl font-semibold tracking-tight">Nâng cấp tài khoản</h2>
             <div className="text-sm">
               Trạng thái:{" "}
-              <span className={isPremium ? "text-green-400 font-semibold" : "text-yellow-300 font-semibold"}>
+              <span className={isPremium ? "font-semibold text-primary" : "font-semibold text-white/62"}>
                 {isPremium ? "Premium" : "Free"}
               </span>
             </div>
@@ -350,27 +348,27 @@ export default function ProfilePage() {
 
           {!isPremium ? (
             <>
-              <ul className="list-disc ml-6 text-sm text-gray-300 mt-4">
-                <li>Xem phim chất lượng cao không quảng cáo</li>
-                <li>Ưu tiên truy cập server nhanh hơn</li>
-                <li>Hỗ trợ tải phim về thiết bị</li>
-                <li>Chia sẻ gói Family cho tối đa 3 tài khoản (nếu mua gói Family)</li>
+              <ul className="mt-5 grid gap-3 text-sm text-white/64 md:grid-cols-2">
+                <li className="glass-panel rounded-2xl px-4 py-3">Xem phim chất lượng cao không quảng cáo</li>
+                <li className="glass-panel rounded-2xl px-4 py-3">Ưu tiên truy cập server nhanh hơn</li>
+                <li className="glass-panel rounded-2xl px-4 py-3">Hỗ trợ tải phim về thiết bị</li>
+                <li className="glass-panel rounded-2xl px-4 py-3">Chia sẻ gói Family cho tối đa 3 tài khoản</li>
               </ul>
 
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
                 {loadingPlans ? (
                   <LoadingEffect message="Đang tải gói" />
                 ) : plans.length === 0 ? (
-                  <div>Chưa có gói nào.</div>
+                  <div className="glass-panel rounded-[1.5rem] p-5 text-white/62">Chưa có gói nào.</div>
                 ) : (
                   plans.map((p) => (
-                    <div key={p.id} className="glass-card rounded p-4">
-                      <div className="flex justify-between items-start">
+                    <div key={p.id} className="glass-card glass-hover rounded-[1.5rem] p-5">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <div className="text-lg font-semibold">{p.name}</div>
-                          <div className="text-sm text-gray-300">{p.description}</div>
-                          <div className="mt-2 text-xl font-bold">{p.price.toLocaleString()} {p.currency} / {p.duration}</div>
-                          <div className="text-sm text-gray-400">Tối đa: {p.maxMembers} người</div>
+                          <div className="text-sm text-white/58">{p.description}</div>
+                          <div className="mt-3 text-2xl font-semibold">{p.price.toLocaleString()} {p.currency} / {p.duration}</div>
+                          <div className="text-sm text-white/46">Tối đa: {p.maxMembers} người</div>
                         </div>
                         <div className="flex flex-col gap-2">
                           <Button onClick={() => handlePurchase(p.key)} disabled={processing}>{processing ? "Chuyển..." : "Mua ngay"}</Button>
@@ -382,22 +380,22 @@ export default function ProfilePage() {
               </div>
             </>
           ) : (
-            <div className=" p-4  rounded">
+            <div className="glass-panel mt-5 rounded-[1.5rem] p-5">
               <p className="text-lg font-semibold">Bạn đang sử dụng gói: {currentPlan?.name ?? premiumInfo?.plan?.name ?? premiumInfo?.planKey}</p>
-              <p className="text-sm text-gray-300">Hết hạn: {premiumInfo?.endDate ? new Date(premiumInfo.endDate).toLocaleString() : "—"}</p>
+              <p className="text-sm text-white/58">Hết hạn: {premiumInfo?.endDate ? new Date(premiumInfo.endDate).toLocaleString() : "-"}</p>
               {role === "member" && ownerEmail && (
-                <p className="text-sm mt-2 text-gray-300">Bạn đang dùng gói do <strong>{ownerEmail}</strong> chia sẻ</p>
+                <p className="mt-2 text-sm text-white/58">Bạn đang dùng gói do <strong>{ownerEmail}</strong> chia sẻ</p>
               )}
             </div>
           )}
         </Card>
 
         {isPremium && role === "owner" && (currentPlan?.maxMembers ?? premiumInfo?.plan?.maxMembers ?? 1) > 1 && (
-          <Card className="mt-4 p-6">
-            <h2 className="text-xl font-bold mb-4">Chia sẻ gói Premium</h2>
+          <Card className="mt-6 p-6 md:p-8">
+            <h2 className="mb-4 text-2xl font-semibold tracking-tight">Chia sẻ gói Premium</h2>
             <div>
               <p className="text-sm">Bạn đang có gói: <strong>{currentPlan?.name ?? premiumInfo?.plan?.name ?? premiumInfo?.planKey}</strong></p>
-              <p className="text-sm">Hết hạn: <strong>{premiumInfo?.endDate ? new Date(premiumInfo.endDate).toLocaleString() : "—"}</strong></p>
+              <p className="text-sm">Hết hạn: <strong>{premiumInfo?.endDate ? new Date(premiumInfo.endDate).toLocaleString() : "-"}</strong></p>
               <div className="mt-3">
                 <p className="text-sm font-semibold">Thành viên:</p>
                 {premiumInfo?.members && premiumInfo.members.length > 0 ? (
@@ -407,7 +405,7 @@ export default function ProfilePage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-gray-300">Chưa có thành viên được thêm.</p>
+                  <p className="text-sm text-white/58">Chưa có thành viên được thêm.</p>
                 )}
               </div>
               <div className="mt-4">

@@ -6,18 +6,21 @@ export default async function SystemPage() {
     const movieCountJson = await movieCount.json()
     const totalMovies = movieCountJson?.data?.params?.pagination?.totalItems ?? 0
     return (
-        <div>
-            <h1 className="text-2xl font-bold mb-4">Chi Tiết</h1>
+        <div className="space-y-6">
+            <div className="glass-panel rounded-[2rem] p-6">
+                <p className="mb-2 text-sm text-white/46">Bảng điều khiển</p>
+                <h1 className="text-3xl font-semibold tracking-tight">Chi tiết hệ thống</h1>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded shadow">
-                    <h3 className="font-semibold">Người Dùng</h3>
-                    <p className="text-2xl">{userCount}</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="glass-card glass-hover rounded-[1.75rem] p-6">
+                    <h3 className="text-sm font-medium text-white/54">Người dùng</h3>
+                    <p className="mt-3 text-4xl font-semibold tabular-nums">{userCount}</p>
                 </div>
 
-                <div className="p-4 rounded shadow">
-                    <h3 className="font-semibold">Phim</h3>
-                    <p className="text-2xl">{totalMovies}</p>
+                <div className="glass-card glass-hover rounded-[1.75rem] p-6">
+                    <h3 className="text-sm font-medium text-white/54">Phim</h3>
+                    <p className="mt-3 text-4xl font-semibold tabular-nums">{totalMovies}</p>
                 </div>
             </div>
         </div>

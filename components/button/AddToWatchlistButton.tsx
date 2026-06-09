@@ -28,7 +28,7 @@ export default function AddToWatchlistButton({ movieId, isSavedInit = false, onC
   const add = async () => {
     if (status === "loading") return;
     if (!session) {
-      toast.warning("Vui lòng đăng nhập để lưu phim vào danh sách!");
+      toast.warning("Vui lòng đăng nhập để lưu phim vào danh sách")
       return;
     }
     try {
@@ -42,7 +42,7 @@ export default function AddToWatchlistButton({ movieId, isSavedInit = false, onC
       });
       const data = await res.json();
       if (res.ok && data.message === "ADDED") {
-        toast.success("Đã thêm vào danh sách xem sau!");
+        toast.success("Đã thêm vào danh sách xem sau")
         onChange?.(true);
         // optional: refresh server data
         // router.refresh();
@@ -51,7 +51,7 @@ export default function AddToWatchlistButton({ movieId, isSavedInit = false, onC
         onChange?.(true);
       } else if (res.status === 401) {
         setIsSaved(false);
-        toast.warning("Vui lòng đăng nhập để sử dụng chức năng này!");
+        toast.warning("Vui lòng đăng nhập để sử dụng chức năng này")
       } else {
         setIsSaved(false);
         toast.error("Đã có lỗi, thử lại sau.");
@@ -67,7 +67,7 @@ export default function AddToWatchlistButton({ movieId, isSavedInit = false, onC
 
   const remove = async () => {
     if (status === "loading") return;
-    if (!session) { toast.warning("Vui lòng đăng nhập để sử dụng chức năng này!"); return; }
+    if (!session) { toast.warning("Vui lòng đăng nhập để sử dụng chức năng này"); return; }
     try {
       setLoading(true);
       // optimistic
@@ -77,7 +77,7 @@ export default function AddToWatchlistButton({ movieId, isSavedInit = false, onC
       });
       const data = await res.json();
       if (res.ok && data.message === "REMOVED") {
-        toast.success("Đã xóa khỏi danh sách xem sau!");
+        toast.success("Đã xóa khỏi danh sách xem sau")
         onChange?.(false);
         // router.refresh(); // optional
       } else {

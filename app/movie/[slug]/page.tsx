@@ -34,7 +34,7 @@ interface Episode {
 const FallbackComponent = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
   <div className="min-h-screen flex items-center justify-center">
     <Card className="p-6">
-      <p className="text-red-600">Có lỗi xảy ra: {error.message}</p>
+      <p className="text-primary">Có lỗi xảy ra: {error.message}</p>
       <Button onClick={resetErrorBoundary} className="mt-4">Thử lại</Button>
     </Card>
   </div>
@@ -121,7 +121,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
     } else {
       try {
         await navigator.clipboard.writeText(url);
-        alert("Đã sao chép link phim!");
+        toast.success("Đã sao chép link phim")
       } catch (err) {
       }
     }
@@ -234,7 +234,7 @@ async function doTogglePremium() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="p-6">
-          <p className="text-red-600">{error}</p>
+          <p className="text-primary">{error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">Thử lại</Button>
         </Card>
       </div>
@@ -245,7 +245,7 @@ async function doTogglePremium() {
 
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-16">
         <Head>
           <title>{movie.name} - Xem phim online</title>
           <meta name="description" content={descriptionText.slice(0, 160)} />
@@ -254,34 +254,34 @@ async function doTogglePremium() {
           <meta property="og:description" content={descriptionText.slice(0, 160)} />
         </Head>
 
-        <div className="relative h-[60vh] overflow-hidden">
+        <div className="relative h-[68dvh] min-h-[520px] overflow-hidden">
           <ImageWithLoader src={getImageUrl(movie.poster_url)} alt={`${movie.name} poster`} fill sizes="100vw" priority className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_74%,rgba(244,63,94,0.28),transparent_32rem),linear-gradient(to_top,rgba(2,3,8,1),rgba(2,3,8,0.72)_48%,rgba(2,3,8,0.12))]" />
         </div>
 
-        <div className="container mx-auto px-4 -mt-32 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="spatial-container relative z-10 -mt-44 px-1">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(260px,360px)_1fr]">
             <div>
-              <Card>
-                <div className="aspect-[2/3] relative">
+              <Card className="glass-hover p-3">
+                <div className="relative aspect-[2/3] overflow-hidden rounded-[1.4rem]">
                   <ImageWithLoader src={getImageUrl(movie.thumb_url)} alt={`${movie.name} thumbnail`} fill sizes="(max-width: 1024px) 100vw, 33vw" loading="lazy" className="object-cover" />
                 </div>
               </Card>
             </div>
 
-            <div className="glass-card lg:col-span-2 rounded-lg p-6">
-              <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
+            <div className="glass-card rounded-[2rem] p-6 md:p-8">
+              <h1 className="text-balance mb-5 flex items-center gap-3 text-3xl font-semibold tracking-tight md:text-5xl">
                 {movie.name}
 
                 {isPremium && (
-                  <Badge variant="destructive" className="text-sm">
+                  <Badge variant="destructive" className="rounded-full text-sm">
                     PREMIUM
                   </Badge>
                 )}
               </h1>
 
 
-              <div className="flex items-center gap-4 mb-4">
+              <div className="mb-5 flex flex-wrap items-center gap-3 text-white/70">
                 <div className="flex items-center gap-1" aria-label={`Năm phát hành: ${movie.year}`}>
                   <Calendar className="w-4 h-4" />
                   <span>{movie.year}</span>
@@ -291,30 +291,30 @@ async function doTogglePremium() {
                   <span>{movie.time}</span>
                 </div>
                 <div className="flex items-center gap-1" aria-label={`Điểm đánh giá: ${movie.tmdb?.vote_average ?? "Chưa có đánh giá"}`}>
-                  <Star className="text-yellow-400 w-4 h-4" />
+                  <Star className="text-primary w-4 h-4" />
                   <span>{movie.tmdb?.vote_average ?? "Chưa có đánh giá"}</span>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="mb-6 flex flex-wrap gap-2">
                 {movie.category?.map((cat: any) => (
-                  <Badge key={cat.name} variant="secondary">{cat.name}</Badge>
+                  <Badge key={cat.name} variant="secondary" className="rounded-full border-white/10 bg-white/10 text-white/76">{cat.name}</Badge>
                 ))}
               </div>
 
               <div className="mb-6">
-                <p id="movie-description" className={`text-muted-foreground transition-all duration-300 ease-in-out ${showFullDescription ? "" : "line-clamp-4"}`}>{descriptionText}</p>
+                <p id="movie-description" className={`max-w-[75ch] text-white/62 leading-relaxed transition-all duration-300 ease-in-out ${showFullDescription ? "" : "line-clamp-4"}`}>{descriptionText}</p>
 
                 {isLongDescription && (
-                  <button onClick={() => setShowFullDescription(!showFullDescription)} className="mt-2 text-red-600 hover:underline font-semibold flex items-center gap-1 group" aria-expanded={showFullDescription} aria-controls="movie-description">
+                  <button onClick={() => setShowFullDescription(!showFullDescription)} className="mt-3 flex items-center gap-1 font-semibold text-primary hover:text-primary/80" aria-expanded={showFullDescription} aria-controls="movie-description">
                     {showFullDescription ? "Thu gọn" : "Xem thêm"}
                   </button>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-4 mb-8">
+              <div className="mb-8 flex flex-wrap gap-3">
                 <Link href={`/watch/${slug}?ep=${selectedEpisode}`}>
-                  <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white" aria-label="Xem phim ngay">
+                  <Button size="lg" aria-label="Xem phim ngay">
                     <Play className="mr-2 h-5 w-5" /> Xem ngay
                   </Button>
                 </Link>
@@ -347,8 +347,8 @@ async function doTogglePremium() {
 
               {episodes.length > 0 ? (
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-4">Danh sách tập</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                  <h3 className="mb-4 text-xl font-semibold">Danh sách tập</h3>
+                  <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
                     {episodes.map((ep, i) => {
                       const episodeName = ep.name?.trim() || `Tập ${i + 1}`;
                       return (<Button key={i} variant={selectedEpisode === i ? "default" : "outline"} size="sm" onClick={() => setSelectedEpisode(i)}>{episodeName}</Button>);
@@ -356,7 +356,7 @@ async function doTogglePremium() {
                   </div>
                 </div>
               ) : (
-                <p className="text-muted-foreground">Không có tập phim nào được tìm thấy.</p>
+                <p className="text-white/54">Không có tập phim nào được tìm thấy.</p>
               )}
             </div>
           </div>
@@ -365,8 +365,8 @@ async function doTogglePremium() {
         </div>
 
         {showPlayer && episodes[selectedEpisode]?.link_embed && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onKeyDown={(e) => e.key === "Escape" && setShowPlayer(false)} tabIndex={0}>
-            <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xl" onKeyDown={(e) => e.key === "Escape" && setShowPlayer(false)} tabIndex={0}>
+            <div className="glass-panel relative aspect-video w-full max-w-4xl overflow-hidden rounded-[2rem] bg-black">
               {episodes[selectedEpisode]?.link_embed ? (
                 <iframe
                   src={episodes[selectedEpisode].link_embed}
@@ -378,7 +378,7 @@ async function doTogglePremium() {
                   onLoad={() => console.log("Iframe loaded")}
                 ></iframe>
               ) : (<p className="text-white">Không có link video hợp lệ.</p>)}
-              <button onClick={() => setShowPlayer(false)} className="absolute top-2 right-2 text-white bg-black/70 hover:bg-black/90 p-2 rounded-full" aria-label="Đóng trình phát video">✕</button>
+              <button onClick={() => setShowPlayer(false)} className="absolute right-3 top-3 rounded-full bg-black/70 p-2 text-white hover:bg-white/12" aria-label="Đóng trình phát video">Đóng</button>
             </div>
           </div>
         )}

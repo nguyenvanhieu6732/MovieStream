@@ -47,14 +47,17 @@ export default function PremiumMoviesPage() {
     fetchMovies();
   };
 
-  if (loading) return <p>Đang tải...</p>;
+  if (loading) return <p className="glass-panel rounded-[1.5rem] p-5 text-white/62">Đang tải...</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+    <div className="space-y-6">
+      <div className="glass-panel rounded-[2rem] p-6">
+      <h1 className="flex items-center gap-3 text-3xl font-semibold tracking-tight">
         <Film /> Quản lý phim Premium
       </h1>
+      </div>
 
+      <div className="glass-card rounded-[1.75rem] p-3">
       <Table>
         <TableHeader>
           <TableRow>
@@ -102,6 +105,7 @@ export default function PremiumMoviesPage() {
           )}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

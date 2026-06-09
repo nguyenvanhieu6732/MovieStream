@@ -10,6 +10,7 @@ export default async function UsersPage() {
       role: true,
       createdAt: true,
       isBanned: true,
+      isDeleted: true,
     },
   })
 
@@ -20,9 +21,12 @@ export default async function UsersPage() {
 
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Users</h1>
-      <UsersTable users={users} />
+    <div className="space-y-6">
+      <div className="glass-panel rounded-[2rem] p-6">
+        <p className="mb-2 text-sm text-white/46">Quản trị</p>
+        <h1 className="text-3xl font-semibold tracking-tight">Người dùng</h1>
+      </div>
+      <UsersTable users={safeUsers} />
     </div>
   )
 }

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Film } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -45,9 +44,9 @@ export default function LoginPage() {
       setMessageType("error")
       toast.error("Email hoặc mật khẩu không đúng")
     } else {
-      setMessage("Đăng nhập thành công! Đang chuyển hướng...")
+      setMessage("Đăng nhập thành công. Đang chuyển hướng...")
       setMessageType("success")
-      toast.success("Đăng nhập thành công!")
+      toast.success("Đăng nhập thành công")
       setTimeout(() => {
         router.push("/")
       }, 1500)
@@ -66,14 +65,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center p-4 pt-28">
+      <Card className="w-full max-w-md p-1">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Film className="h-8 w-8 text-red-600 mr-2" />
-            <span className="text-2xl font-bold">MovieStream</span>
+          <div className="mb-4 flex items-center justify-center">
+            <div className="glass-panel inline-flex items-center gap-3 rounded-[1.5rem] px-4 py-3">
+              <Film className="h-7 w-7 text-primary" />
+              <span className="text-2xl font-semibold tracking-tight">MovieStream</span>
+            </div>
           </div>
-          <CardTitle className="text-2xl">Chào Mừng Trở Lại</CardTitle>
+          <CardTitle className="text-3xl">Chào mừng trở lại</CardTitle>
           <CardDescription>Đăng nhập để tiếp tục xem phim</CardDescription>
         </CardHeader>
         <CardContent>
@@ -104,7 +105,7 @@ export default function LoginPage() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-1 top-1 h-10 px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -146,13 +147,13 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             Chưa có tài khoản?{" "}
-            <Link href="/register" className="text-red-600 hover:underline">
-              Đăng Ký
+            <Link href="/register" className="font-semibold text-primary hover:text-primary/80">
+              Đăng ký
             </Link>
           </div>
 
           <div className="mt-4 text-center">
-            <Link href="/" className="text-sm text-muted-foreground hover:underline">
+            <Link href="/" className="text-sm text-white/52 hover:text-white">
               Quay về trang chủ
             </Link>
           </div>

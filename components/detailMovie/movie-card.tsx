@@ -19,7 +19,7 @@ function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
     <Link
       href={`/movie/${movie.slug}`}
       prefetch={false}
-      className="glass-card group block overflow-hidden rounded-lg shadow hover:-translate-y-1 hover:shadow-lg transition relative"
+      className="glass-card glass-hover group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[1.6rem] transition"
     >
       <div className={`relative w-full ${aspectClass}`}>
         <ImageWithLoader
@@ -45,9 +45,9 @@ function MovieCardComponent({ movie, variant = "thumbnail" }: Props) {
           </span>
         )}
       </div>
-      <div className="p-2">
-        <h3 className="text-sm font-semibold line-clamp-1">{movie.name}</h3>
-        <p className="text-xs text-gray-400 line-clamp-1">{movie.origin_name}</p>
+      <div className="min-h-[72px] min-w-0 flex-1 p-3">
+        <h3 className="truncate text-sm font-semibold leading-snug text-white" title={movie.name}>{movie.name}</h3>
+        <p className="mt-1 truncate text-xs text-white/48" title={movie.origin_name}>{movie.origin_name}</p>
       </div>
     </Link>
   );

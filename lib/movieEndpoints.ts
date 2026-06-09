@@ -36,7 +36,7 @@ export const movieEndpoints = [
   {
     key: "latestMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_CHIEU_RAP),
-    title: "Phim Chiáº¿u Ráº¡p",
+    title: "Phim Chiếu Rạp",
     country: "",
     movieSlug: movieSlug.PHIM_CHIEU_RAP,
     seeAllLink: "/movies?movieSlug=phim-chieu-rap",
@@ -44,7 +44,7 @@ export const movieEndpoints = [
   {
     key: "hanQuocMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_MOI, { country: COUNTRY.HAN_QUOC }),
-    title: "Phim HÃ n Quá»‘c",
+    title: "Phim Hàn Quốc",
     country: COUNTRY.HAN_QUOC,
     movieSlug: movieSlug.PHIM_MOI,
     seeAllLink: "/movies?movieSlug=phim-han-quoc",
@@ -52,7 +52,7 @@ export const movieEndpoints = [
   {
     key: "trungQuocMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_BO, { country: COUNTRY.TRUNG_QUOC }),
-    title: "Phim Trung Quá»‘c",
+    title: "Phim Trung Quốc",
     country: COUNTRY.TRUNG_QUOC,
     movieSlug: movieSlug.PHIM_MOI,
     seeAllLink: "/movies?movieSlug=phim-trung-quoc",
@@ -60,7 +60,7 @@ export const movieEndpoints = [
   {
     key: "auMyMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_BO, { country: COUNTRY.AU_MY }),
-    title: "Phim Ã‚u Má»¹",
+    title: "Phim Âu Mỹ",
     country: COUNTRY.AU_MY,
     movieSlug: movieSlug.PHIM_MOI,
     seeAllLink: "/movies?movieSlug=phim-au-my",
@@ -68,7 +68,7 @@ export const movieEndpoints = [
   {
     key: "phimBo",
     url: listUrl(constants.MOVIE_SLUG.PHIM_BO),
-    title: "Phim Bá»™",
+    title: "Phim Bộ",
     country: "",
     movieSlug: movieSlug.PHIM_BO,
     seeAllLink: "/movies?movieSlug=phim-bo",
@@ -76,7 +76,7 @@ export const movieEndpoints = [
   {
     key: "phimLe",
     url: listUrl(constants.MOVIE_SLUG.PHIM_LE),
-    title: "Phim Láº»",
+    title: "Phim Lẻ",
     country: "",
     movieSlug: movieSlug.PHIM_LE,
     seeAllLink: "/movies?movieSlug=phim-le",
@@ -84,7 +84,7 @@ export const movieEndpoints = [
   {
     key: "phimchieurap",
     url: listUrl(constants.MOVIE_SLUG.PHIM_CHIEU_RAP),
-    title: "Phim Chiáº¿u Ráº¡p",
+    title: "Phim Chiếu Rạp",
     country: "",
     movieSlug: movieSlug.PHIM_CHIEU_RAP,
     seeAllLink: "/movies?movieSlug=phim-chieu-rap",
@@ -92,7 +92,7 @@ export const movieEndpoints = [
   {
     key: "nhatBanMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_MOI, { country: COUNTRY.NHAT_BAN }),
-    title: "Phim Nháº­t Báº£n",
+    title: "Phim Nhật Bản",
     country: COUNTRY.NHAT_BAN,
     movieSlug: movieSlug.PHIM_MOI,
     seeAllLink: "/movies?movieSlug=phim-nhat-ban",
@@ -100,7 +100,7 @@ export const movieEndpoints = [
   {
     key: "thaiLanMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_MOI, { country: COUNTRY.THAI_LAN }),
-    title: "Phim ThÃ¡i Lan",
+    title: "Phim Thái Lan",
     country: COUNTRY.THAI_LAN,
     movieSlug: movieSlug.PHIM_MOI,
     seeAllLink: "/movies?movieSlug=phim-thai-lan",
@@ -108,7 +108,7 @@ export const movieEndpoints = [
   {
     key: "sapChieuMovies",
     url: listUrl(constants.MOVIE_SLUG.PHIM_SAP_CHIEU),
-    title: "Phim Sáº¯p Chiáº¿u",
+    title: "Phim Sắp Chiếu",
     country: "",
     movieSlug: movieSlug.PHIM_SAP_CHIEU,
     seeAllLink: "/movies?movieSlug=phim-sap-chieu",

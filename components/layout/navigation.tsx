@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { Heart, LogOut, Menu, Search, Settings, User, X } from "lucide-react"
+import { motion } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,8 +22,8 @@ import { SearchDropdown } from "../home/SearchDropdown"
 import { ImageWithLoader } from "@/components/ui/image-with-loader"
 
 const navLinks = [
-  { label: "❤", popup: true },
-  { href: "/movies?movieSlug=tv-show", label: "tv-show" },
+  { label: "Yêu thích", popup: true },
+  { href: "/movies?movieSlug=tv-show", label: "TV Show" },
   { href: "/movies?movieSlug=phim-le", label: "Phim Lẻ" },
   { href: "/movies?movieSlug=phim-bo", label: "Phim Bộ" },
   { href: "/movies?movieSlug=hoat-hinh", label: "Hoạt Hình" },
@@ -101,29 +102,30 @@ export function Navigation() {
 
   return (
     <>
-      <nav
-        className={`
-        fixed top-0 left-0 w-full z-[1000]
-        transition-colors duration-300
-        min-h-[64px]
-        text-white
-        ${scrolled || isMenuOpen ? "glass-panel border-b border-white/10" : "bg-transparent"}
-        `}
+      <motion.nav
+        initial={{ opacity: 0, y: -18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 130, damping: 24 }}
+        className="fixed left-0 right-0 top-4 z-[1000] px-3 text-white md:px-6"
       >
-        <div className="nav-container">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center space-x-2" onClick={closeMenu}>
-              <Image src="/logo.png" alt="MovieStream Logo" width={64} height={64} />
-              <span className="text-xl font-bold">MovieStream</span>
+        <div
+          className={`spatial-container rounded-[1.75rem] px-3 md:px-5 ${
+            scrolled || isMenuOpen ? "glass-panel" : "border border-white/8 bg-black/10 backdrop-blur-xl"
+          }`}
+        >
+          <div className="flex h-[68px] items-center justify-between gap-4">
+            <Link href="/" className="group flex items-center gap-3" onClick={closeMenu}>
+              <Image src="/logo.png" alt="MovieStream Logo" width={46} height={46} className="rounded-2xl shadow-[0_14px_34px_rgba(0,0,0,0.32)] transition-transform duration-300 group-hover:scale-105" />
+              <span className="text-lg font-semibold tracking-tight md:text-xl">MovieStream</span>
             </Link>
 
-            <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md relative mx-8">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <form onSubmit={handleSearch} className="relative mx-2 hidden max-w-[26rem] flex-1 md:flex">
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/54" />
 
               <Input
                 type="search"
                 placeholder="Tìm kiếm phim..."
-                className="pl-10 rounded-xl border-white/15 bg-slate-950/45"
+                className="h-11 rounded-[1.4rem] pl-11"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={handleFocus}
@@ -135,14 +137,19 @@ export function Navigation() {
               )}
             </form>
 
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden items-center gap-1 rounded-[1.4rem] border border-white/10 bg-white/[0.035] p-1 md:flex">
               {navLinks.map((item, i) =>
                 item.popup ? (
-                  <button key={i} onClick={() => setShowPopup(true)} className="hover:text-gray-300">
-                    {item.label}
+                  <button
+                    key={i}
+                    onClick={() => setShowPopup(true)}
+                    className="inline-flex items-center gap-2 rounded-[1.1rem] px-3 py-2 text-sm text-white/76 hover:bg-white/10 hover:text-white"
+                  >
+                    <Heart className="h-4 w-4" />
+                    <span className="sr-only">{item.label}</span>
                   </button>
                 ) : (
-                  <Link key={i} href={item.href!}>
+                  <Link key={i} href={item.href!} className="rounded-[1.1rem] px-3 py-2 text-sm font-medium text-white/76 hover:bg-white/10 hover:text-white">
                     {item.label}
                   </Link>
                 )
@@ -153,7 +160,7 @@ export function Navigation() {
               {session?.user ? (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild className="dropdown-menu-trigger">
-                    <Avatar className="h-10 w-10 mx-4 cursor-pointer avatar flex items-center justify-center">
+                    <Avatar className="avatar mx-2 flex h-11 w-11 cursor-pointer items-center justify-center border border-white/16 bg-white/10 shadow-[0_16px_38px_rgba(0,0,0,0.28)]">
                       <AvatarImage src={session?.user?.image ?? "/placeholder.svg"} />
                       <AvatarFallback>{session?.user?.name?.charAt(0) ?? "U"}</AvatarFallback>
                     </Avatar>
@@ -190,7 +197,7 @@ export function Navigation() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="hidden md:flex items-center space-x-2 mr-4">
+                <div className="mr-1 hidden items-center gap-2 md:flex">
                   <Link href="/login">
                     <Button variant="ghost">Đăng Nhập</Button>
                   </Link>
@@ -204,7 +211,7 @@ export function Navigation() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden mobile-menu-toggle"
+                className="mobile-menu-toggle md:hidden"
                 onClick={() => setIsMenuOpen((prev) => !prev)}
               >
                 {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -213,7 +220,11 @@ export function Navigation() {
           </div>
 
           {isMenuOpen && (
-            <div className="glass-panel md:hidden fixed top-16 left-0 w-full flex flex-col space-y-2 py-4 px-4 border-t border-white/10">
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="glass-panel fixed left-3 right-3 top-[88px] flex flex-col space-y-2 rounded-[1.75rem] p-4 md:hidden"
+            >
               {navLinks.map((item, i) =>
                 item.popup ? (
                   <button
@@ -222,32 +233,32 @@ export function Navigation() {
                       setShowPopup(true)
                       setIsMenuOpen(false)
                     }}
-                    className="text-left px-2"
+                    className="rounded-2xl px-3 py-2 text-left text-white/82 hover:bg-white/10"
                   >
                     {item.label}
                   </button>
                 ) : (
-                  <Link key={i} href={item.href!} onClick={() => setIsMenuOpen(false)} className="px-2">
+                  <Link key={i} href={item.href!} onClick={() => setIsMenuOpen(false)} className="rounded-2xl px-3 py-2 text-white/82 hover:bg-white/10">
                     {item.label}
                   </Link>
                 )
               )}
-            </div>
+            </motion.div>
           )}
         </div>
-      </nav>
+      </motion.nav>
 
       {showPopup && (
         <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[2000]"
+          className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/70 p-4 backdrop-blur-xl"
           onClick={() => setShowPopup(false)}
         >
-          <div className="glass-panel relative rounded-xl p-4" onClick={(e) => e.stopPropagation()}>
-            <button className="absolute top-2 right-2 text-white text-xl" onClick={() => setShowPopup(false)}>
-              ✕
+          <div className="glass-panel relative rounded-[2rem] p-4" onClick={(e) => e.stopPropagation()}>
+            <button className="absolute right-3 top-3 rounded-full bg-black/40 p-2 text-white hover:bg-white/12" onClick={() => setShowPopup(false)} aria-label="Đóng">
+              <X className="h-5 w-5" />
             </button>
 
-            <ImageWithLoader src="/bac.jpg" alt="❤" width={400} height={400} className="rounded-lg" />
+            <ImageWithLoader src="/bac.jpg" alt="Danh sách phim yêu thích" width={400} height={400} className="rounded-[1.5rem]" />
           </div>
         </div>
       )}

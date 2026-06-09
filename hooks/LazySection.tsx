@@ -61,7 +61,7 @@ export default function LazyCarousels({ carousels }: { carousels: CarouselConfig
   const device = useDeviceType();
 
   return (
-    <div ref={ref} className="my-10 space-y-10">
+    <div ref={ref} className="my-14 space-y-14">
       {loading && <LoadingEffect message="Đang tải phim..." />}
       {carousels.map(c =>
         moviesData[c.title]?.length > 0 ? (

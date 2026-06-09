@@ -64,14 +64,17 @@ export default function MoviesPage({ searchParams }: { searchParams: { country?:
 
   return (
     <ScrollRestore storageKey="movies-scroll" >
-      <div className="min-h-screen pt-16 max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6  mt-4">
-          {movieSlug
-            ? `${MOVIE_SLUG_LABEL[movieSlug] || movieSlug} mới nhất`
-            : country
-              ? `Phim ${movies[0]?.country?.[0]?.name} mới nhất`
-              : "Tất cả phim"}
-        </h1>
+      <div className="spatial-container min-h-screen px-1 pb-16 pt-32 md:pt-36">
+        <div className="glass-panel mb-8 rounded-[2rem] p-6 md:p-8">
+          <p className="mb-2 text-sm font-medium text-white/46">Thư viện phim</p>
+          <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">
+            {movieSlug
+              ? `${MOVIE_SLUG_LABEL[movieSlug] || movieSlug} mới nhất`
+              : country
+                ? `Phim ${movies[0]?.country?.[0]?.name} mới nhất`
+                : "Tất cả phim"}
+          </h1>
+        </div>
 
         {loading ? <LoadingEffect /> : <MovieGrid movies={movies} />}
 

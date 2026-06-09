@@ -114,7 +114,7 @@ export default function CommentSection({ slug }: { slug: string }) {
           <Button
           size="sm"
           // variant="outline"
-          className="border-destructive text-black hover:bg-black/10"
+          className="border-destructive text-white hover:bg-white/10"
           onClick={() => {
             toast.dismiss();
             resolve(false);
@@ -168,11 +168,11 @@ export default function CommentSection({ slug }: { slug: string }) {
   };
 
   return (
-    <div className="mt-12 space-y-6 py-6 bg-[#020817] p-6 rounded-lg">
-      <h3 className="text-xl font-semibold">Bình luận</h3>
+    <div className="glass-card mt-12 space-y-6 rounded-[2rem] p-6 md:p-8">
+      <h3 className="text-2xl font-semibold tracking-tight">Bình luận</h3>
 
       <div className="flex gap-4">
-        <Avatar>
+        <Avatar className="border border-white/12 bg-white/10">
           <AvatarImage src={session?.user?.image || "/placeholder.svg"} />
           <AvatarFallback>{session?.user?.name?.[0] || "U"}</AvatarFallback>
         </Avatar>
@@ -195,16 +195,16 @@ export default function CommentSection({ slug }: { slug: string }) {
 
       <div className="space-y-4">
         {loadingFetch ? (
-          <p className="text-sm text-muted-foreground">Đang tải bình luận...</p>
+          <p className="text-sm text-white/54">Đang tải bình luận...</p>
         ) : comments.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Chưa có bình luận nào.</p>
+          <p className="glass-panel rounded-[1.5rem] p-5 text-sm text-white/54">Chưa có bình luận nào.</p>
         ) : (
           comments.map((c) => (
             <div
               key={c.id}
-              className="flex items-start gap-4 p-4 rounded-lg bg-muted/40"
+              className="glass-panel flex items-start gap-4 rounded-[1.5rem] p-4"
             >
-              <Avatar>
+              <Avatar className="border border-white/12 bg-white/10">
                 <AvatarImage src={c.avatar || "/placeholder.svg"} />
                 <AvatarFallback>{c.user[0]}</AvatarFallback>
               </Avatar>
@@ -212,7 +212,7 @@ export default function CommentSection({ slug }: { slug: string }) {
                 <div className="flex justify-between mb-1">
                   <strong>{c.user}</strong>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{c.timestamp}</span>
+                    <span className="text-sm text-white/42">{c.timestamp}</span>
                     {session?.user?.id === c.userId && (
                       <Button
                         variant="ghost"
@@ -225,7 +225,7 @@ export default function CommentSection({ slug }: { slug: string }) {
                     )}
                   </div>
                 </div>
-                <p className="text-gray-300">{c.content}</p>
+                <p className="text-white/68">{c.content}</p>
               </div>
             </div>
           ))

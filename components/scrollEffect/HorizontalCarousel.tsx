@@ -24,24 +24,24 @@ export default function HorizontalCarousel({
   const device = useDeviceType();
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden rounded-[1.75rem]">
       {emblaApi && device === "desktop" && (
         <>
           {/* Chevron trái */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 z-20 flex items-center">
+          <div className="absolute bottom-0 left-0 top-0 z-20 flex w-14 items-center bg-gradient-to-r from-[#05070d]/80 to-transparent">
             <button
               onClick={() => emblaApi?.scrollPrev()}
-              className="bg-white text-black p-2 rounded-full shadow-lg"
+              className="glass-panel rounded-full p-2 text-white"
             >
               <ChevronLeft size={28} strokeWidth={2.5} />
             </button>
           </div>
 
           {/* Chevron phải */}
-          <div className="absolute right-0 top-0 bottom-0 w-12 z-20 flex items-center justify-end">
+          <div className="absolute bottom-0 right-0 top-0 z-20 flex w-14 items-center justify-end bg-gradient-to-l from-[#05070d]/80 to-transparent">
             <button
               onClick={() => emblaApi?.scrollNext()}
-              className="bg-white text-black p-2 rounded-full shadow-lg"
+              className="glass-panel rounded-full p-2 text-white"
             >
               <ChevronRight size={28} strokeWidth={2.5} />
             </button>
@@ -51,9 +51,9 @@ export default function HorizontalCarousel({
 
       {/* Track */}
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex" style={{ gap: `${gap}px` }}>
+        <div className="flex items-stretch" style={{ gap: `${gap}px` }}>
           {items.map((item, idx) => (
-            <div key={idx} className="flex-shrink-0" style={{ width: itemWidth }}>
+            <div key={idx} className="flex min-w-0 flex-shrink-0" style={{ width: itemWidth }}>
               {item}
             </div>
           ))}

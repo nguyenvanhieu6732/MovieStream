@@ -1,16 +1,14 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import SplashProvider from "@/components/effect/SplashProvider"
 import AuthProvider from "@/providers/session-provider"
-import { Toaster } from "sonner"  // ✅ Thêm
+import { Toaster } from "sonner"
 import HeaderWrapper from "@/components/layout/HeaderWrapper"
 import FooterWrapper from "@/components/layout/FooterWrapper"
 import PageTransition from "@/components/layout/PageTransition"
 
-const inter = Inter({ subsets: ["latin"] })
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
@@ -34,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <SplashProvider>

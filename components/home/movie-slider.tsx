@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/getImageUrl";
 import { OPhimMovie } from "@/lib/interface";
@@ -39,17 +40,17 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
   }, [emblaApi]);
 
   return (
-    <section className="relative aspect-[16/9] md:h-[100vh] w-full overflow-hidden">
-      <div className="overflow-hidden h-full" ref={emblaRef}>
+    <section className="relative h-[72dvh] min-h-[520px] w-full overflow-hidden md:h-[100dvh]">
+      <div className="h-full overflow-hidden" ref={emblaRef}>
         <div className="flex h-full">
           {movies.map((movie, index) => (
             <div
               key={movie._id}
               className="min-w-full relative h-full flex-shrink-0"
             >
-              <div>
+              <div className="relative h-full">
                 <ImageWithLoader
-                  src={getImageUrl(movie.poster_url)}
+                  src={getImageUrl(movie.thumb_url || movie.poster_url)}
                   alt={movie.name}
                   fill
                   wrapperClassName="absolute inset-0"
@@ -61,7 +62,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
 
                 <div className="absolute inset-0 z-10">
                   <div className="absolute inset-0 bg-black/20" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_76%,rgba(244,63,94,0.28),transparent_30rem),linear-gradient(to_top,rgba(2,3,8,1),rgba(2,3,8,0.62)_42%,rgba(2,3,8,0.08))]" />
                 </div>
                 {device === "mobile" && (
                   <Link
@@ -72,15 +73,21 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                   />
                 )}
 
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-16 z-30">
-                  <div className="max-w-md sm:max-w-xl md:max-w-3xl space-y-2 sm:space-y-3 md:space-y-5">
+                <div className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-10 sm:p-8 md:p-16">
+                  <motion.div
+                    key={`${movie._id}-${selectedIndex}`}
+                    initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 110, damping: 24 }}
+                    className="glass-panel max-w-md space-y-2 rounded-[2rem] p-5 sm:max-w-xl sm:space-y-3 sm:p-7 md:max-w-3xl md:space-y-5 md:p-8"
+                  >
                     {device === "mobile" ? (
-                      <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow">
+                      <h1 className="text-balance text-xl font-semibold tracking-tight text-white sm:text-2xl">
                         {movie.name}
                       </h1>
                     ) : (
                       <>
-                        <h1 className="text-xl sm:text-3xl md:text-5xl font-bold text-white drop-shadow">
+                        <h1 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
                           {movie.name}
                         </h1>
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
@@ -88,7 +95,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                             <Badge
                               key={genre.name}
                               variant="secondary"
-                              className="capitalize text-white bg-white/20 backdrop-blur-sm text-xs sm:text-sm"
+                              className="rounded-full border-white/12 bg-white/10 text-xs capitalize text-white/86 backdrop-blur-xl sm:text-sm"
                             >
                               {genre.name}
                             </Badge>
@@ -98,7 +105,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                           <Link href={`/watch/${movie.slug}`} prefetch={false}>
                             <Button
                               size="sm"
-                              className="bg-red-600 hover:bg-red-700 text-white shadow-md sm:size-md md:size-lg"
+                              className="sm:size-md md:size-lg"
                             >
                               <Play className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                               Xem ngay
@@ -108,7 +115,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border text-white bg-white/20 sm:size-md md:size-lg"
+                              className="sm:size-md md:size-lg"
                             >
                               Thông tin thêm
                             </Button>
@@ -116,7 +123,7 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
                         </div>
                       </>
                     )}
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -128,14 +135,14 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
         <>
           <button
             onClick={() => emblaApi?.scrollPrev()}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/80 p-1.5 sm:p-2 rounded-full text-white transition"
+            className="glass-panel absolute left-3 top-1/2 z-30 -translate-y-1/2 rounded-full p-2 text-white transition hover:scale-105 sm:left-6"
             aria-label="Previous Slide"
           >
             <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6" />
           </button>
           <button
             onClick={() => emblaApi?.scrollNext()}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/80 p-1.5 sm:p-2 rounded-full text-white transition"
+            className="glass-panel absolute right-3 top-1/2 z-30 -translate-y-1/2 rounded-full p-2 text-white transition hover:scale-105 sm:right-6"
             aria-label="Next Slide"
           >
             <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6" />
@@ -144,14 +151,14 @@ export default function MovieSlider({ movies }: MovieSliderProps) {
       )}
 
       {device == "desktop" && (
-        <div className="absolute bottom-3 pt-8 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex gap-1.5 sm:gap-2">
+        <div className="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 gap-2">
           {movies.map((_, i) => (
             <button
               key={i}
               onClick={() => emblaApi?.scrollTo(i)}
-              className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${selectedIndex === i
-                ? "bg-white scale-110"
-                : "bg-white/40 hover:bg-white/70"
+              className={`h-2 rounded-full transition-all duration-300 ${selectedIndex === i
+                ? "w-8 bg-white"
+                : "w-2 bg-white/36 hover:bg-white/70"
                 }`}
               aria-label={`Go to slide ${i + 1}`}
             />

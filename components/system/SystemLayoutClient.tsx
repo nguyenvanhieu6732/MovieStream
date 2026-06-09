@@ -22,18 +22,18 @@ export default function SystemLayoutClient({
 }) {
     return (
         <SidebarProvider>
-            <div className="flex min-h-screen w-full bg-neutral-950 text-neutral-100">
+            <div className="flex min-h-screen w-full text-neutral-100">
 
                 {/* Sidebar */}
-                <Sidebar>
-                    <SidebarHeader className="h-16 px-4 flex items-center">
+                <Sidebar className="border-white/10 bg-transparent">
+                    <SidebarHeader className="h-20 px-4 flex items-center">
                         <Link href="/" className="flex items-center gap-3">
                             <Image
                                 src="/logo.png"
                                 alt="MovieStream Logo"
                                 width={32}
                                 height={32}
-                                className="rounded-md"
+                                className="rounded-2xl"
                             />
                             <span className="text-lg font-semibold tracking-tight">
                                 MovieStream
@@ -42,7 +42,7 @@ export default function SystemLayoutClient({
                     </SidebarHeader>
 
 
-                    <SidebarContent>
+                    <SidebarContent className="px-2">
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
@@ -63,13 +63,13 @@ export default function SystemLayoutClient({
                 </Sidebar>
 
                 {/* MAIN – PHẢI DÙNG SidebarInset */}
-                <SidebarInset>
-                    <header className="h-16 flex items-center gap-2 border-b border-neutral-800 px-4">
+                <SidebarInset className="bg-transparent">
+                    <header className="glass-panel mx-3 mt-4 flex h-16 items-center gap-3 rounded-[1.75rem] px-4">
                         <SidebarTrigger />
-                        <span className="font-semibold">Hệ Thống</span>
+                        <span className="font-semibold">Hệ thống</span>
                     </header>
 
-                    <main className="flex-1 p-4 lg:p-6">
+                    <main className="flex-1 p-4 pt-6 lg:p-6">
                         {children}
                     </main>
                 </SidebarInset>

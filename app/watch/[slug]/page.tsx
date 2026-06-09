@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, Star, Ticket } from "lucide-react";
+import { ChevronDown, Play, Star, Ticket } from "lucide-react";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import CommentSection from "@/components/detailMovie/comment-section";
 import Link from "next/link";
@@ -109,15 +109,14 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
   const descriptionText = extractTextFromHtml(movie.content);
 
   return (
-    <div className="min-h-screen text-white">
-      <div className="container mx-auto px-4 py-6">
-        <div className="text-xl font-semibold mb-4 mt-16">
+    <div className="min-h-screen pb-16 text-white">
+      <div className="spatial-container px-1 py-6 pt-32 md:pt-36">
+        <div className="mb-5 text-balance text-2xl font-semibold tracking-tight md:text-4xl">
           Xem phim {movie.name} - Tập {currentEpisodeName}
         </div>
 
-        {/* Video player */}
-        <Card className="mb-6">
-          <div className="aspect-video relative rounded-md overflow-hidden">
+        <Card className="mb-8 p-3">
+          <div className="relative aspect-video overflow-hidden rounded-[1.6rem]">
 
             {!isPlaying ? (
               /* ================= POSTER ================= */
@@ -132,27 +131,28 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
                 {/* 🔒 PREMIUM + KHÔNG CÓ QUYỀN */}
                 {!canWatch && isMoviePremium ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-center p-4">
-                    <Ticket className="w-12 h-12 text-yellow-400 mb-2" />
-                    <p className="text-lg font-semibold text-yellow-400">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 p-4 text-center backdrop-blur-md">
+                    <Ticket className="mb-3 h-12 w-12 text-primary" />
+                    <p className="text-lg font-semibold text-white">
                       Phim Premium
                     </p>
-                    <p className="text-sm text-white/80 mb-4">
+                    <p className="mb-4 text-sm text-white/72">
                       Bạn cần nâng cấp tài khoản để xem phim này
                     </p>
                     <Link href="/profile">
-                      <Button className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                      <Button>
                         Nâng cấp Premium
                       </Button>
                     </Link>
                   </div>
                 ) : (
-                  /* ▶️ CÓ QUYỀN → PLAY */
                   <button
                     onClick={() => setIsPlaying(true)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition"
+                    className="absolute inset-0 flex items-center justify-center bg-black/35 transition hover:bg-black/52"
                   >
-                    <Play className="w-12 h-12 text-white" />
+                    <span className="glass-panel grid h-24 w-24 place-items-center rounded-full">
+                      <Play className="h-12 w-12 text-white" />
+                    </span>
                   </button>
                 )}
               </div>
@@ -168,8 +168,8 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                 />
               ) : (
                 /* ⚠️ LINK LỖI */
-                <div className="w-full h-full flex items-center justify-center bg-black/70 text-red-500">
-                  <div className="text-center p-4 border border-red-500 rounded-lg bg-black/60">
+                <div className="flex h-full w-full items-center justify-center bg-black/70 text-primary">
+                  <div className="glass-panel rounded-[1.5rem] p-6 text-center">
                     <p className="text-lg font-semibold">Không thể phát video</p>
                     <p className="text-sm text-white/80">
                       Link bị lỗi hoặc không tồn tại
@@ -180,7 +180,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
             ) : (
               /* 🚫 KHÔNG CÓ QUYỀN */
-              <div className="w-full h-full flex items-center justify-center bg-black/70 text-red-500">
+              <div className="flex h-full w-full items-center justify-center bg-black/70 text-primary">
                 <p>Bạn không có quyền xem nội dung này</p>
               </div>
             )}
@@ -189,33 +189,32 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
         </Card>
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
           <div className="lg:col-span-2">
             <Card className="mb-6">
-              <CardContent className="p-6">
-                <h1 className="text-2xl font-bold mb-4">{movie.name}</h1>
-                <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-300">
+              <CardContent className="p-6 md:p-7">
+                <h1 className="mb-4 text-2xl font-semibold tracking-tight md:text-3xl">{movie.name}</h1>
+                <div className="mb-4 flex flex-wrap items-center gap-4 text-white/64">
                   <span>{movie.year}</span>
                   <span>{movie.time}</span>
                   <div className="flex items-center gap-1">
-                    <Star className="text-yellow-400 w-4 h-4" />
+                    <Star className="text-primary w-4 h-4" />
                     <span>{movie.tmdb.vote_average || "Chưa có đánh giá"}</span>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="mb-4 flex flex-wrap gap-2">
                   {movie.category?.map((g: any) => (
                     <Badge
                       key={g.name}
                       variant="secondary"
-                      className="bg-gray-800 text-gray-300 capitalize"
+                      className="rounded-full border-white/10 bg-white/10 text-white/72 capitalize"
                     >
                       {g.name}
                     </Badge>
                   ))}
                 </div>
 
-                <div className="text-gray-400 leading-relaxed">
+                <div className="leading-relaxed text-white/62">
                   <p
                     className={`transition-all duration-300 ease-in-out ${showFullDescription ? "" : "line-clamp-4"
                       }`}
@@ -225,21 +224,17 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                   {isLongDescription && (
                     <button
                       onClick={() => setShowFullDescription(!showFullDescription)}
-                      className="mt-2 text-red-500 hover:underline font-semibold flex items-center gap-1 group"
+                      className="group mt-3 flex items-center gap-1 font-semibold text-primary hover:text-primary/80"
                     >
                       {showFullDescription ? (
                         <>
                           Thu gọn
-                          <svg className="w-4 h-4 rotate-180 group-hover:scale-110 transition" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <ChevronDown className="h-4 w-4 rotate-180 transition group-hover:scale-110" />
                         </>
                       ) : (
                         <>
                           Xem thêm
-                          <svg className="w-4 h-4 group-hover:scale-110 transition" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <ChevronDown className="h-4 w-4 transition group-hover:scale-110" />
                         </>
                       )}
                     </button>
@@ -250,9 +245,9 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
 
             {episodeList.length > 0 && (
               <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Danh sách tập</h3>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                <CardContent className="p-6 md:p-7">
+                  <h3 className="mb-4 text-xl font-semibold">Danh sách tập</h3>
+                  <div className="grid grid-cols-3 gap-2 md:grid-cols-6">
                     {episodeList.map((ep: any, index: number) => {
                       const episodeName = ep.name?.trim() || `Tập ${index + 1}`;
                       const isSelected = selectedEpisode === index;
@@ -275,11 +270,10 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
             <CommentSection slug={Array.isArray(slug) ? slug[0] : slug} /> {/* Đảm bảo slug là string */}
           </div>
 
-          {/* Sidebar: Gợi ý phim */}
           <div className="lg:col-span-1">
             <Card>
-              <CardContent className="p-4">
-                <h3 className="text-xl font-semibold mb-4">Gợi ý phim</h3>
+              <CardContent className="p-4 md:p-5">
+                <h3 className="mb-4 text-xl font-semibold">Gợi ý phim</h3>
                 <div className="space-y-4">
                   {relatedMovies.map((item) => (
                     <Link
@@ -288,8 +282,8 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                       prefetch={false}
                       className="block group"
                     >
-                      <div className="flex gap-3 hover:bg-white/10 p-2 rounded-lg transition">
-                        <div className="relative w-20 h-[120px] rounded overflow-hidden">
+                      <div className="flex gap-3 rounded-[1.35rem] p-2 transition hover:bg-white/10">
+                        <div className="relative h-[120px] w-20 overflow-hidden rounded-[1rem]">
                           <ImageWithLoader
                             src={getImageUrl(item.thumb_url)}
                             alt={item.name}
@@ -299,10 +293,10 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                           />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-white group-hover:text-red-400 line-clamp-2">
+                          <p className="text-sm font-semibold text-white group-hover:text-primary line-clamp-2">
                             {item.name}
                           </p>
-                          <p className="text-xs text-gray-400">{item.year}</p>
+                          <p className="text-xs text-white/46">{item.year}</p>
                         </div>
                       </div>
                     </Link>

@@ -62,15 +62,21 @@ export default function WatchlistPage() {
   if (loading) return <LoadingEffect />;
   if (movies.length === 0)
     return (
-      <div className="min-h-screen flex items-center justify-center pt-16">
-      Danh sách xem sau trống.
+      <div className="flex min-h-screen items-center justify-center p-4 pt-28">
+        <div className="glass-panel max-w-lg rounded-[2rem] p-8 text-center">
+          <h1 className="mb-2 text-3xl font-semibold tracking-tight">Danh sách xem sau trống</h1>
+          <p className="text-white/58">Lưu một bộ phim để quay lại sau.</p>
+        </div>
       </div>
     );
 
   return (
     <ScrollRestore storageKey="watchlist-scroll">
-      <div className="min-h-screen pt-16 max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6 mt-4">Danh sách xem sau</h1>
+      <div className="spatial-container min-h-screen px-1 pb-16 pt-32 md:pt-36">
+        <div className="glass-panel mb-8 rounded-[2rem] p-6 md:p-8">
+          <p className="mb-2 text-sm font-medium text-white/46">Thư viện cá nhân</p>
+          <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">Danh sách xem sau</h1>
+        </div>
         <MovieGrid movies={movies} />
       </div>
     </ScrollRestore>

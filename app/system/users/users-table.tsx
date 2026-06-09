@@ -91,9 +91,9 @@ export default function UsersTable({ users }: { users: User[] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="glass-card overflow-x-auto rounded-[1.75rem] p-3">
       <table className="w-full text-sm">
-        <thead>
+        <thead className="text-white/54">
           <tr>
             <th className="p-3 text-left">Họ Tên</th>
             <th className="p-3 text-left">Email</th>
@@ -105,12 +105,12 @@ export default function UsersTable({ users }: { users: User[] }) {
 
         <tbody>
           {list.map((user) => (
-            <tr key={user.id} className="border-t">
-              <td className="p-3">{user.name ?? "—"}</td>
+            <tr key={user.id} className="border-t border-white/8">
+              <td className="p-3">{user.name ?? "-"}</td>
 
               <td
                 className={`p-3 ${
-                  user.isDeleted ? "line-through text-gray-400" : ""
+                  user.isDeleted ? "line-through text-white/38" : ""
                 }`}
               >
                 {user.email != null ? user.email : "Facebook User"}
@@ -120,8 +120,8 @@ export default function UsersTable({ users }: { users: User[] }) {
                 <span
                   className={`px-2 py-1 rounded text-xs ${
                     user.role === "admin"
-                      ? "bg-red-100 text-red-600"
-                      : "bg-blue-100 text-blue-600"
+                      ? "border border-primary/20 bg-primary/12 text-primary"
+                      : "border border-white/12 bg-white/10 text-white/68"
                   }`}
                 >
                   {user.role}
@@ -134,12 +134,12 @@ export default function UsersTable({ users }: { users: User[] }) {
 
               <td className="p-3">
                 {user.role === "admin" ? (
-                  <span className="text-gray-400 italic">admin</span>
+                  <span className="text-white/42 italic">admin</span>
                 ) : user.isDeleted ? (
                   <button
                     disabled={loadingId === user.id}
                     onClick={() => confirmAction(user, "restore")}
-                    className="px-3 py-1 rounded bg-blue-100 text-blue-600"
+                    className="rounded-full border border-white/12 bg-white/10 px-3 py-1 text-white/72 hover:bg-white/14"
                   >
                     Khôi Phục
                   </button>
@@ -149,7 +149,7 @@ export default function UsersTable({ users }: { users: User[] }) {
                       <button
                         disabled={loadingId === user.id}
                         onClick={() => confirmAction(user, "unban")}
-                        className="px-3 py-1 rounded bg-green-100 text-green-600"
+                        className="rounded-full border border-white/12 bg-white/10 px-3 py-1 text-white/72 hover:bg-white/14"
                       >
                         Gỡ Cấm
                       </button>
@@ -157,7 +157,7 @@ export default function UsersTable({ users }: { users: User[] }) {
                       <button
                         disabled={loadingId === user.id}
                         onClick={() => confirmAction(user, "ban")}
-                        className="px-3 py-1 rounded bg-yellow-100 text-yellow-600"
+                        className="rounded-full border border-white/12 bg-white/10 px-3 py-1 text-white/72 hover:bg-white/14"
                       >
                         Cấm
                       </button>
@@ -166,7 +166,7 @@ export default function UsersTable({ users }: { users: User[] }) {
                     <button
                       disabled={loadingId === user.id}
                       onClick={() => confirmAction(user, "delete")}
-                      className="px-3 py-1 rounded bg-red-100 text-red-600"
+                      className="rounded-full border border-primary/20 bg-primary/12 px-3 py-1 text-primary hover:bg-primary/18"
                     >
                       Xóa
                     </button>
