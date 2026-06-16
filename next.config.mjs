@@ -32,6 +32,7 @@ const nextConfig = {
     minimumCacheTTL: 86400,
     remotePatterns: [
       { protocol: 'https', hostname: 'img.ophim.live' },
+      { protocol: 'https', hostname: 'img.ophim.cc' },
       { protocol: 'https', hostname: 'img.ophim1.com' },
       { protocol: 'https', hostname: 'ophim1.com' },
       { protocol: 'https', hostname: 'ophim.cc' },

@@ -5,6 +5,19 @@ import { movieEndpoints } from "@/lib/movieEndpoints";
 import * as constants from "@/lib/constants";
 import LazyCarousels from "../../hooks/LazySection";
 
+const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
+
+type HomeApiMovie = OPhimMovie & {
+  category?: OPhimMovie["categories"];
+};
+
+type HomeApiResponse = {
+  data?: {
+    items?: HomeApiMovie[];
+    APP_DOMAIN_CDN_IMAGE?: string;
+  };
+};
+
 async function fetchMovies(url: string): Promise<OPhimMovie[]> {
   try {
     const res = await fetch(url, { next: { revalidate: 3600 } });
@@ -17,16 +30,39 @@ async function fetchMovies(url: string): Promise<OPhimMovie[]> {
   }
 }
 
+async function fetchHomeHero(): Promise<{
+  movies: OPhimMovie[];
+  imageBaseUrl?: string;
+}> {
+  try {
+    const res = await fetch(`${OPHIM_API}/home`, { next: { revalidate: 3600 } });
+    if (!res.ok) throw new Error(`Failed to fetch home: ${res.status}`);
+
+    const data = (await res.json()) as HomeApiResponse;
+    const movies = (data.data?.items || []).slice(0, 5).map((movie) => ({
+      ...movie,
+      categories: movie.categories || movie.category || [],
+    }));
+
+    return {
+      movies,
+      imageBaseUrl: data.data?.APP_DOMAIN_CDN_IMAGE,
+    };
+  } catch (err) {
+    console.error(err);
+    return { movies: [] };
+  }
+}
+
 export default async function HomePageServer() {
   const results = await Promise.allSettled([
-    fetchMovies(movieEndpoints[0].url),
+    fetchHomeHero(),
     fetchMovies(movieEndpoints[1].url),
     fetchMovies(movieEndpoints[2].url),
     fetchMovies(movieEndpoints[3].url),
   ]);
 
-  const latestMovies = results[0].status === "fulfilled" ? results[0].value : [];
-  const featuredMovies = latestMovies.slice(0, 5);
+  const hero = results[0].status === "fulfilled" ? results[0].value : { movies: [] };
 
   const hanQuocMovies = results[1].status === "fulfilled" ? results[1].value : [];
   const trungQuocMovies = results[2].status === "fulfilled" ? results[2].value : [];
@@ -34,7 +70,7 @@ export default async function HomePageServer() {
 
   return (
     <div className="min-h-screen">
-      <MovieSlider movies={featuredMovies} />
+      <MovieSlider movies={hero.movies} imageBaseUrl={hero.imageBaseUrl} />
 
       <MovieHorizontalSlider
         gradient={constants.GRADIENTS.PURPLE}
