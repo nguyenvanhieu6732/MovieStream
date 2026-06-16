@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma"
 
 export default async function SystemPage() {
-    const userCount = await prisma.user.count()
-    const movieCount = await fetch(`${process.env.NEXT_PUBLIC_OPHIM_API}/home`)
+    const [userCount, movieCount] = await Promise.all([
+        prisma.user.count(),
+        fetch(`${process.env.NEXT_PUBLIC_OPHIM_API}/home`, { next: { revalidate: 3600 } }),
+    ])
     const movieCountJson = await movieCount.json()
     const totalMovies = movieCountJson?.data?.params?.pagination?.totalItems ?? 0
     return (

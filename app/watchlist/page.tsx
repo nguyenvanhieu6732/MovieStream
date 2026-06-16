@@ -7,19 +7,6 @@ import MovieGrid from "@/components/detailMovie/movie-grid";
 import { LoadingEffect } from "@/components/effect/loading-effect";
 import ScrollRestore from "@/components/scrollEffect/ScrollRestore";
 
-async function fetchMovieBySlug(slug: string) {
-  try {
-    const res = await fetch(`https://ophim1.com/v1/api/phim/${slug}`);
-    const data = await res.json();
-    if (data?.data?.item) {
-      return data.data.item as OPhimMovie;
-    }
-  } catch (err) {
-    console.error("Fetch movie error:", err);
-  }
-  return null;
-}
-
 export default function WatchlistPage() {
   const [movies, setMovies] = useState<OPhimMovie[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +14,7 @@ export default function WatchlistPage() {
   useEffect(() => {
     const fetchWatchlistAndMovies = async () => {
       try {
-        const res = await fetch("/api/watchlist", { credentials: "include" });
+        const res = await fetch("/api/watchlist?includeDetails=1", { credentials: "include" });
         const data = await res.json();
 
         if (res.status === 401) {
@@ -36,18 +23,7 @@ export default function WatchlistPage() {
           return;
         }
 
-        const list = data.watchlist || [];
-        if (list.length === 0) {
-          setMovies([]);
-          setLoading(false);
-          return;
-        }
-
-        const fetchedMovies = await Promise.all(
-          list.map((item: { movieId: string }) => fetchMovieBySlug(item.movieId))
-        );
-
-        setMovies(fetchedMovies.filter((movie): movie is OPhimMovie => Boolean(movie)));
+        setMovies((data.movies || []).filter((movie: OPhimMovie | null): movie is OPhimMovie => Boolean(movie)));
       } catch (err) {
         console.error("Lỗi lấy watchlist:", err);
         toast.error("Lấy danh sách thất bại");

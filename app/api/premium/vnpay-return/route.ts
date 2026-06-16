@@ -2,10 +2,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import qs from "qs";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
-const prisma = new PrismaClient();
 const secretKey = process.env.VNPAY_HASH_SECRET!;
 
 function sortObject(obj: Record<string, string>) {

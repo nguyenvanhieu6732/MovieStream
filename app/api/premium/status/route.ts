@@ -1,11 +1,9 @@
 // app/api/premium/status/route.ts
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // adjust path to your next-auth config
 export const dynamic = "force-dynamic";
-
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {

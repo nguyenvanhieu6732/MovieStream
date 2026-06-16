@@ -36,7 +36,7 @@ function getPrimaryType(type?: string) {
 
 async function fetchItems(url: string) {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { next: { revalidate: 3600 } });
     if (!res.ok) return [];
     const data = await res.json();
     return data.data?.items || data.items || [];
@@ -62,8 +62,12 @@ export async function fetchRelatedMovies(source: RelatedMovieSource, limit = 6):
   const seen = new Set<string>();
   const related: RelatedMovie[] = [];
 
-  for (const url of urls) {
-    const items = await fetchItems(url);
+  const results = await Promise.allSettled(urls.map((url) => fetchItems(url)));
+
+  for (const result of results) {
+    if (result.status !== "fulfilled") continue;
+
+    const items = result.value;
     for (const item of items) {
       if (!item?.slug || item.slug === currentSlug || seen.has(item.slug)) continue;
       seen.add(item.slug);

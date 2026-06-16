@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import qs from "qs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
 
 const tmnCode = process.env.VNPAY_TMN_CODE;
 const returnUrl = process.env.VNPAY_RETURN_URL;
