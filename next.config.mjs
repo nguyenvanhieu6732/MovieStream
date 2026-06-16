@@ -36,6 +36,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'img.ophim1.com' },
       { protocol: 'https', hostname: 'ophim1.com' },
       { protocol: 'https', hostname: 'ophim.cc' },
+      { protocol: 'https', hostname: 'image.tmdb.org' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'scontent.fhan15-2.fna.fbcdn.net' },

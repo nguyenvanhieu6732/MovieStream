@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Play, Star, Ticket } from "lucide-react";
+import { ChevronDown, Play, Star, Ticket, UserRound } from "lucide-react";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import CommentSection from "@/components/detailMovie/comment-section";
 import Link from "next/link";
@@ -15,13 +15,33 @@ import { LoadingEffect } from "@/components/effect/loading-effect";
 import { useSession } from "next-auth/react";
 import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
+const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
+const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
+
+type MoviePerson = {
+  tmdb_people_id: number;
+  name: string;
+  original_name?: string;
+  character?: string;
+  known_for_department?: string;
+  profile_path?: string | null;
+};
+
+function getProfileImageUrl(profilePath?: string | null, size = "w185") {
+  if (!profilePath) return "/placeholder.svg";
+  if (/^https?:\/\//i.test(profilePath)) return profilePath;
+  return `${TMDB_IMAGE_BASE}/${size}${profilePath.startsWith("/") ? profilePath : `/${profilePath}`}`;
+}
+
 export default function WatchPage({ params }: { params: { slug: string } }) {
   const { slug } = useParams();
   const [movie, setMovie] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isLongDescription, setIsLongDescription] = useState(false);
+  const [showAllEpisodes, setShowAllEpisodes] = useState(false);
   const [relatedMovies, setRelatedMovies] = useState<any[]>([]);
+  const [peoples, setPeoples] = useState<MoviePerson[]>([]);
   const searchParams = useSearchParams();
   const epFromQuery = searchParams.get("ep");
 
@@ -59,6 +79,14 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
           const suggestions = relatedJson.items.filter((m: any) => m.slug !== slug).slice(0, 4);
           setRelatedMovies(suggestions);
         }
+
+        const peoplesRes = await fetch(`${OPHIM_API}/phim/${slug}/peoples`);
+        if (peoplesRes.ok) {
+          const peoplesJson = await peoplesRes.json();
+          setPeoples((peoplesJson.data?.peoples || []).slice(0, 8));
+        } else {
+          setPeoples([]);
+        }
       } catch (err) {
         console.error("Lỗi khi tải phim:", err);
       }
@@ -95,6 +123,12 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
     setIsPlaying(false);
   }, [selectedEpisode]);
 
+  useEffect(() => {
+    if (selectedEpisode >= 12) {
+      setShowAllEpisodes(true);
+    }
+  }, [selectedEpisode]);
+
   if (!movie) {
     return <LoadingEffect message="Đang tải thông tin phim..." />;
   }
@@ -107,6 +141,9 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
       : currentEpisode?.name || "1";
 
   const descriptionText = extractTextFromHtml(movie.content);
+  const hasMoreEpisodes = episodeList.length > 6;
+  const visibleEpisodes = showAllEpisodes ? episodeList : episodeList.slice(0, 12);
+  const showMoreButtonClassName = episodeList.length > 12 ? "mt-4 flex justify-center" : "mt-4 flex justify-center md:hidden";
 
   return (
     <div className="min-h-screen pb-16 text-white">
@@ -248,7 +285,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                 <CardContent className="p-6 md:p-7">
                   <h3 className="mb-4 text-xl font-semibold">Danh sách tập</h3>
                   <div className="grid grid-cols-3 gap-2 md:grid-cols-6">
-                    {episodeList.map((ep: any, index: number) => {
+                    {visibleEpisodes.map((ep: any, index: number) => {
                       const episodeName = ep.name?.trim() || `Tập ${index + 1}`;
                       const isSelected = selectedEpisode === index;
                       return (
@@ -257,12 +294,28 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                           variant={isSelected ? "default" : "outline"}
                           size="sm"
                           onClick={() => setSelectedEpisode(index)}
+                          className={!showAllEpisodes && index >= 6 ? "hidden md:inline-flex" : ""}
                         >
                           {episodeName}
                         </Button>
                       );
                     })}
                   </div>
+                  {hasMoreEpisodes && (
+                    <div className={showMoreButtonClassName}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAllEpisodes((value) => !value)}
+                        className="min-w-36"
+                      >
+                        {showAllEpisodes ? "Thu gọn" : "Xem thêm"}
+                        <ChevronDown
+                          className={`h-4 w-4 transition ${showAllEpisodes ? "rotate-180" : ""}`}
+                        />
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -302,6 +355,60 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                     </Link>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-1">
+            <Card>
+              <CardContent className="p-4 md:p-5">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h3 className="text-xl font-semibold">Diễn viên</h3>
+                  <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs text-white/54">
+                    {peoples.length}
+                  </span>
+                </div>
+
+                {peoples.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    {peoples.map((person) => (
+                      <div
+                        key={`${person.tmdb_people_id}-${person.character || person.name}`}
+                        className="flex gap-3 rounded-[1.35rem] p-2 transition hover:bg-white/10"
+                      >
+                        <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-[1rem] bg-slate-900">
+                          <ImageWithLoader
+                            src={getProfileImageUrl(person.profile_path)}
+                            alt={person.name}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1 py-1">
+                          <p className="line-clamp-1 text-sm font-semibold text-white">
+                            {person.name}
+                          </p>
+                          {person.character && (
+                            <p className="mt-1 line-clamp-2 text-xs leading-5 text-white/56">
+                              {person.character}
+                            </p>
+                          )}
+                          {person.known_for_department && (
+                            <p className="mt-1 text-[11px] font-medium text-primary/80">
+                              {person.known_for_department}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-[1.35rem] border border-white/10 bg-white/[0.04] p-5 text-center text-sm text-white/54">
+                    <UserRound className="mx-auto mb-3 h-8 w-8 text-white/42" />
+                    Chưa có dữ liệu diễn viên
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

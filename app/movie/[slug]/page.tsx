@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, Play, Share2, Star, Ticket } from "lucide-react";
+import { Calendar, ChevronDown, Clock, Play, Share2, Star, Ticket } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
 import dynamic from "next/dynamic";
@@ -48,6 +48,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [showPlayer, setShowPlayer] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [showAllEpisodes, setShowAllEpisodes] = useState(false);
   const [isLongDescription, setIsLongDescription] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession()
@@ -105,6 +106,12 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
     fetchMovie();
     return () => controller.abort();
   }, [slug]);
+
+  useEffect(() => {
+    if (selectedEpisode >= 12) {
+      setShowAllEpisodes(true);
+    }
+  }, [selectedEpisode]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -229,6 +236,21 @@ async function doTogglePremium() {
   }, [slug]);
 
   const handleWatchlistChange = (saved: boolean) => setIsInWatchlist(Boolean(saved));
+  const visibleEpisodes = showAllEpisodes ? episodes : episodes.slice(0, 12);
+  const hasMoreEpisodes = episodes.length > 4;
+  const showMoreButtonClassName =
+    episodes.length > 12
+      ? "mt-4 flex justify-center"
+      : episodes.length > 8
+        ? "mt-4 flex justify-center lg:hidden"
+        : "mt-4 flex justify-center md:hidden";
+
+  const getCollapsedEpisodeClassName = (index: number) => {
+    if (showAllEpisodes) return "";
+    if (index >= 8) return "hidden lg:inline-flex";
+    if (index >= 4) return "hidden md:inline-flex";
+    return "";
+  };
 
   if (error) {
     return (
@@ -349,11 +371,36 @@ async function doTogglePremium() {
                 <div className="mb-6">
                   <h3 className="mb-4 text-xl font-semibold">Danh sách tập</h3>
                   <div className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
-                    {episodes.map((ep, i) => {
+                    {visibleEpisodes.map((ep, i) => {
                       const episodeName = ep.name?.trim() || `Tập ${i + 1}`;
-                      return (<Button key={i} variant={selectedEpisode === i ? "default" : "outline"} size="sm" onClick={() => setSelectedEpisode(i)}>{episodeName}</Button>);
+                      return (
+                        <Button
+                          key={i}
+                          variant={selectedEpisode === i ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedEpisode(i)}
+                          className={getCollapsedEpisodeClassName(i)}
+                        >
+                          {episodeName}
+                        </Button>
+                      );
                     })}
                   </div>
+                  {hasMoreEpisodes && (
+                    <div className={showMoreButtonClassName}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAllEpisodes((value) => !value)}
+                        className="min-w-36"
+                      >
+                        {showAllEpisodes ? "Thu gọn" : "Xem thêm"}
+                        <ChevronDown
+                          className={`h-4 w-4 transition ${showAllEpisodes ? "rotate-180" : ""}`}
+                        />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-white/54">Không có tập phim nào được tìm thấy.</p>
