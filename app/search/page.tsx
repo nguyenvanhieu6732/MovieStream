@@ -17,7 +17,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
-  const debouncedSearchQuery = useDebounce(searchQuery, 1000)
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
   // Đồng bộ query từ URL
   useEffect(() => {
@@ -37,13 +37,12 @@ export default function SearchPage() {
 
       setLoading(true)
       try {
-        const res = await fetch(
-          `https://ophim1.com/v1/api/tim-kiem?keyword=${encodeURIComponent(debouncedSearchQuery)}`,
-          { signal: controller.signal }
-        )
+        const res = await fetch(`/api/search?keyword=${encodeURIComponent(debouncedSearchQuery)}`, {
+          signal: controller.signal,
+        })
         const json = await res.json()
-        if (json.status && Array.isArray(json.data?.items)) {
-          setResults(json.data.items)
+        if (Array.isArray(json.data)) {
+          setResults(json.data)
         } else {
           setResults([])
         }
