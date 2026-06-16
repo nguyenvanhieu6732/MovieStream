@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import confirmToast from "@/lib/confirmToast";
 import { toast } from "sonner"
 import { ImageWithLoader } from "@/components/ui/image-with-loader";
+import { fetchRelatedMovies, type RelatedMovie } from "@/lib/relatedMovies";
 
 
 
@@ -51,6 +52,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
   const [showAllEpisodes, setShowAllEpisodes] = useState(false);
   const [isLongDescription, setIsLongDescription] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [relatedMovies, setRelatedMovies] = useState<RelatedMovie[]>([]);
   const { data: session } = useSession()
   const [isPremium, setIsPremium] = useState(false);
   const [loadingPremium, setLoadingPremium] = useState(false);
@@ -81,6 +83,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string } }
         setMovie(item as MovieItem);
         const eps: Episode[] = item.episodes?.[0]?.server_data || (Array.isArray(item.server_data) ? item.server_data : []);
         setEpisodes(eps);
+        setRelatedMovies(await fetchRelatedMovies(item, 6));
         const plainText = extractTextFromHtml(item.content || "");
         setIsLongDescription(plainText.split("\n").length > 4 || plainText.length > 300);
 
@@ -407,6 +410,36 @@ async function doTogglePremium() {
               )}
             </div>
           </div>
+
+          {relatedMovies.length > 0 && (
+            <div className="glass-card mt-12 rounded-[2rem] p-6 md:p-8">
+              <h2 className="mb-5 text-2xl font-semibold tracking-tight">Gợi ý phim liên quan</h2>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+                {relatedMovies.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/movie/${item.slug}`}
+                    prefetch={false}
+                    className="group min-w-0"
+                  >
+                    <div className="relative aspect-[2/3] overflow-hidden rounded-[1.2rem] bg-slate-900">
+                      <ImageWithLoader
+                        src={item.poster_url || item.thumb_url || "/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 16vw"
+                        className="object-cover transition duration-500 group-hover:scale-105 group-hover:brightness-90"
+                      />
+                    </div>
+                    <p className="mt-3 line-clamp-2 text-sm font-semibold text-white group-hover:text-primary">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-xs text-white/46">{item.year}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-12"><CommentSection slug={slug} /></div>
         </div>

@@ -14,6 +14,7 @@ import { getImageUrl } from "@/lib/getImageUrl";
 import { LoadingEffect } from "@/components/effect/loading-effect";
 import { useSession } from "next-auth/react";
 import { ImageWithLoader } from "@/components/ui/image-with-loader";
+import { fetchRelatedMovies, type RelatedMovie } from "@/lib/relatedMovies";
 
 const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -40,7 +41,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isLongDescription, setIsLongDescription] = useState(false);
   const [showAllEpisodes, setShowAllEpisodes] = useState(false);
-  const [relatedMovies, setRelatedMovies] = useState<any[]>([]);
+  const [relatedMovies, setRelatedMovies] = useState<RelatedMovie[]>([]);
   const [peoples, setPeoples] = useState<MoviePerson[]>([]);
   const searchParams = useSearchParams();
   const epFromQuery = searchParams.get("ep");
@@ -72,13 +73,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
         setIsLongDescription(lineCount > 4 || plainText.length > 300);
 
         // Fetch phim liên quan
-        const firstCategorySlug = json.movie.category?.[0]?.slug;
-        if (firstCategorySlug) {
-          const relatedRes = await fetch(`https://ophim1.com/danh-sach/phim-moi-cap-nhat?page=1`);
-          const relatedJson = await relatedRes.json();
-          const suggestions = relatedJson.items.filter((m: any) => m.slug !== slug).slice(0, 4);
-          setRelatedMovies(suggestions);
-        }
+        setRelatedMovies(await fetchRelatedMovies(json.movie, 4));
 
         const peoplesRes = await fetch(`${OPHIM_API}/phim/${slug}/peoples`);
         if (peoplesRes.ok) {
@@ -338,7 +333,7 @@ export default function WatchPage({ params }: { params: { slug: string } }) {
                       <div className="flex gap-3 rounded-[1.35rem] p-2 transition hover:bg-white/10">
                         <div className="relative h-[120px] w-20 overflow-hidden rounded-[1rem]">
                           <ImageWithLoader
-                            src={getImageUrl(item.thumb_url)}
+                            src={item.thumb_url || "/placeholder.svg"}
                             alt={item.name}
                             fill
                             sizes="80px"

@@ -30,6 +30,7 @@ model User {
   sessions       Session[]
   watchlist      Watchlist[]
   comments       Comment[]
+  commentLikes   CommentLike[]
   // relations
   subscriptions  Subscription[]       @relation("UserSubscriptions")
   payments       Payment[]            @relation("UserPayments")
@@ -96,8 +97,27 @@ model Comment {
   createdAt DateTime @default(now())
   userId    String   @db.ObjectId
   postId    String   @db.ObjectId
+  parentId  String?  @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("CommentReplies")
+  likes     CommentLike[]
+
+  @@index([postId])
+  @@index([parentId])
+}
+
+model CommentLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  commentId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@index([commentId])
 }
 
 /////////////////////// Premium models ///////////////////////
