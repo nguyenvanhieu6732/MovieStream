@@ -18,6 +18,7 @@ import confirmToast from "@/lib/confirmToast";
 import { toast } from "sonner"
 import { ImageWithLoader } from "@/components/ui/image-with-loader";
 import type { RelatedMovie } from "@/lib/relatedMovies";
+import { VideoPlayer } from "@/components/video/VideoPlayer";
 
 
 
@@ -29,6 +30,7 @@ const CommentSection = dynamic(() => import("@/components/detailMovie/comment-se
 interface Episode {
   name?: string;
   link_embed: string;
+  link_m3u8?: string;
 }
 
 type MovieDetailClientProps = {
@@ -407,20 +409,15 @@ async function doTogglePremium() {
           <div className="mt-12"><CommentSection slug={slug} /></div>
         </div>
 
-        {showPlayer && episodes[selectedEpisode]?.link_embed && (
+        {showPlayer && episodes[selectedEpisode] && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xl" onKeyDown={(e) => e.key === "Escape" && setShowPlayer(false)} tabIndex={0}>
             <div className="glass-panel relative aspect-video w-full max-w-4xl overflow-hidden rounded-[2rem] bg-black">
-              {episodes[selectedEpisode]?.link_embed ? (
-                <iframe
-                  src={episodes[selectedEpisode].link_embed}
-                  allowFullScreen
-                  sandbox="allow-same-origin allow-scripts"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full"
-                  title="Video phát phim"
-                  onLoad={() => console.log("Iframe loaded")}
-                ></iframe>
-              ) : (<p className="text-white">Không có link video hợp lệ.</p>)}
+              <VideoPlayer
+                key={`${selectedEpisode}-${episodes[selectedEpisode]?.link_m3u8 || ""}`}
+                src={episodes[selectedEpisode]?.link_m3u8}
+                poster={getImageUrl(movie.poster_url)}
+                title={`Xem phim ${movie.name}`}
+              />
               <button onClick={() => setShowPlayer(false)} className="absolute right-3 top-3 rounded-full bg-black/70 p-2 text-white hover:bg-white/12" aria-label="Đóng trình phát video">Đóng</button>
             </div>
           </div>

@@ -13,6 +13,7 @@ import { getImageUrl } from "@/lib/getImageUrl";
 import { useSession } from "next-auth/react";
 import { ImageWithLoader } from "@/components/ui/image-with-loader";
 import type { RelatedMovie } from "@/lib/relatedMovies";
+import { VideoPlayer } from "@/components/video/VideoPlayer";
 
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
 
@@ -168,11 +169,12 @@ export default function WatchClient({
             ) : canWatch ? (
               /* ================= ĐANG PLAY ================= */
 
-              currentEpisode?.link_embed ? (
-                <iframe
-                  src={currentEpisode.link_embed}
-                  allowFullScreen
-                  className="w-full h-full"
+              currentEpisode?.link_m3u8 ? (
+                <VideoPlayer
+                  key={`${selectedEpisode}-${currentEpisode.link_m3u8}`}
+                  src={currentEpisode.link_m3u8}
+                  poster={getImageUrl(movie.poster_url)}
+                  title={`Xem phim ${movie.name} - Tập ${currentEpisodeName}`}
                 />
               ) : (
                 /* ⚠️ LINK LỖI */

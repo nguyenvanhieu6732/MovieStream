@@ -10,6 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api"
 type Episode = {
   name?: string;
   link_embed: string;
+  link_m3u8?: string;
 };
 
 async function fetchMovie(slug: string): Promise<MovieItem | null> {
