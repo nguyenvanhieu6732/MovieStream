@@ -31,6 +31,9 @@ const navLinks = [
   { href: "/search", label: "Tìm kiếm" },
 ]
 
+const accountMenuItemClass =
+  "rounded-[0.9rem] px-3 py-2.5 text-[0.95rem] font-semibold text-white outline-none transition-colors hover:bg-white/10 focus:bg-white/10 data-[highlighted]:bg-white/10 data-[highlighted]:text-white"
+
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -41,16 +44,40 @@ export function Navigation() {
 
   const router = useRouter()
   const debouncedQuery = useDebounce(searchQuery, 400)
+  const searchFormRef = useRef<HTMLFormElement | null>(null)
   const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [dropdownPosition, setDropdownPosition] = useState<{ left: number; top: number; width: number } | null>(null)
   const { data: session } = useSession()
 
   const closeMenu = () => setIsMenuOpen(false)
+  const updateDropdownPosition = useCallback(() => {
+    const rect = searchFormRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setDropdownPosition({
+      left: rect.left,
+      top: rect.bottom + 12,
+      width: rect.width,
+    })
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 0)
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (!showDropdown) return
+
+    updateDropdownPosition()
+    window.addEventListener("scroll", updateDropdownPosition, { passive: true })
+    window.addEventListener("resize", updateDropdownPosition)
+
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPosition)
+      window.removeEventListener("resize", updateDropdownPosition)
+    }
+  }, [showDropdown, updateDropdownPosition])
 
   useEffect(() => {
     if (!debouncedQuery.trim()) {
@@ -97,6 +124,7 @@ export function Navigation() {
 
   const handleFocus = () => {
     if (blurTimeout.current) clearTimeout(blurTimeout.current)
+    updateDropdownPosition()
     if (searchResults.length > 0) setShowDropdown(true)
   }
 
@@ -119,21 +147,25 @@ export function Navigation() {
               <span className="text-lg font-semibold tracking-tight md:text-xl">MovieStream</span>
             </Link>
 
-            <form onSubmit={handleSearch} className="relative mx-2 hidden max-w-[26rem] flex-1 md:flex">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/54" />
+            <form ref={searchFormRef} onSubmit={handleSearch} className="relative z-[1300] mx-2 hidden max-w-[26rem] flex-1 isolate md:flex">
+              <Search className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-white/54" />
 
               <Input
                 type="search"
                 placeholder="Tìm kiếm phim..."
-                className="h-11 rounded-[1.4rem] pl-11"
+                className="relative z-10 h-11 rounded-[1.4rem] pl-11"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
 
-              {showDropdown && searchResults.length > 0 && (
-                <SearchDropdown results={searchResults} onClose={() => setShowDropdown(false)} />
+              {showDropdown && searchResults.length > 0 && dropdownPosition && (
+                <SearchDropdown
+                  results={searchResults}
+                  onClose={() => setShowDropdown(false)}
+                  position={dropdownPosition}
+                />
               )}
             </form>
 
@@ -166,32 +198,40 @@ export function Navigation() {
                     </Avatar>
                   </DropdownMenuTrigger>
 
-                  <DropdownMenuContent align="end" sideOffset={8} alignOffset={-4}>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={10}
+                    alignOffset={-6}
+                    className="min-w-[9.5rem] rounded-[1.35rem] border border-white/10 bg-[#020817]/95 p-2 text-white shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl"
+                  >
                     {session.user.role === "admin" && (
-                      <DropdownMenuItem asChild>
+                      <DropdownMenuItem asChild className={accountMenuItemClass}>
                         <Link href="/system">
-                          <Settings className="mr-2 h-4 w-4" />
+                          <Settings className="mr-2 h-4 w-4 text-white" />
                           Hệ Thống
                         </Link>
                       </DropdownMenuItem>
                     )}
 
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild className={accountMenuItemClass}>
                       <Link href="/profile">
-                        <User className="mr-2 h-4 w-4" />
+                        <User className="mr-2 h-4 w-4 text-white" />
                         Hồ Sơ
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild className={accountMenuItemClass}>
                       <Link href="/watchlist">
-                        <Heart className="mr-2 h-4 w-4" />
+                        <Heart className="mr-2 h-4 w-4 text-white" />
                         Xem Sau
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-                      <LogOut className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem
+                      className={accountMenuItemClass}
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      <LogOut className="mr-2 h-4 w-4 text-white" />
                       Đăng Xuất
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -228,17 +268,6 @@ export function Navigation() {
           transition={{ type: "spring", stiffness: 180, damping: 22 }}
           className="glass-panel fixed left-4 right-4 top-[96px] z-[1200] flex max-h-[calc(100dvh-120px)] flex-col gap-2 overflow-y-auto rounded-[1.75rem] p-4 text-white shadow-[0_28px_90px_rgba(0,0,0,0.5)] md:hidden"
         >
-          <form onSubmit={handleSearch} className="relative mb-2">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/54" />
-            <Input
-              type="search"
-              placeholder="Tìm kiếm phim..."
-              className="h-11 rounded-[1.4rem] pl-11"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
-
           {navLinks.map((item, i) =>
             item.popup ? (
               <button
