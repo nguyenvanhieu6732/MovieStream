@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Hls from "hls.js";
 import {
   ArrowLeft,
@@ -82,6 +82,13 @@ export function VideoPlayer({
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverX, setHoverX] = useState<number>(0);
 
+  // Preview thumbnail states
+  const previewVideoRef = useRef<HTMLVideoElement | null>(null);
+  const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewSeekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastPreviewTimeRef = useRef<number>(-1);
+
   // Parse title into Main Title and Subtitle (e.g. Movie Name & Episode Name)
   const { mainTitle, subTitle } = useMemo(() => {
     if (!title) return { mainTitle: "", subTitle: "" };
@@ -96,6 +103,93 @@ export function VideoPlayer({
     if (!duration) return 0;
     return Math.min(100, Math.max(0, (currentTime / duration) * 100));
   }, [currentTime, duration]);
+
+  // Initialize preview video element for timeline thumbnails
+  useEffect(() => {
+    if (!src) return;
+
+    const previewVideo = document.createElement("video");
+    previewVideo.preload = "metadata";
+    previewVideo.muted = true;
+    previewVideo.playsInline = true;
+    previewVideo.crossOrigin = "anonymous";
+    previewVideo.style.display = "none";
+    document.body.appendChild(previewVideo);
+    previewVideoRef.current = previewVideo;
+
+    // Set up HLS for preview video if needed
+    let previewHls: Hls | null = null;
+
+    if (previewVideo.canPlayType("application/vnd.apple.mpegurl")) {
+      previewVideo.src = src;
+    } else if (Hls.isSupported()) {
+      previewHls = new Hls({
+        enableWorker: false,
+        lowLatencyMode: false,
+        maxBufferLength: 1,
+        maxMaxBufferLength: 2,
+      });
+      previewHls.loadSource(src);
+      previewHls.attachMedia(previewVideo);
+    }
+
+    // Create canvas for thumbnail capture
+    const canvas = document.createElement("canvas");
+    canvas.width = 192;
+    canvas.height = 108;
+    previewCanvasRef.current = canvas;
+
+    return () => {
+      previewHls?.destroy();
+      previewVideo.pause();
+      previewVideo.removeAttribute("src");
+      previewVideo.load();
+      if (previewVideo.parentNode) {
+        previewVideo.parentNode.removeChild(previewVideo);
+      }
+      previewVideoRef.current = null;
+      previewCanvasRef.current = null;
+      setPreviewUrl(null);
+      if (previewSeekTimeoutRef.current) {
+        clearTimeout(previewSeekTimeoutRef.current);
+      }
+    };
+  }, [src]);
+
+  // Generate preview thumbnail at a given time
+  const generatePreview = useCallback((targetTime: number) => {
+    const previewVideo = previewVideoRef.current;
+    const canvas = previewCanvasRef.current;
+    if (!previewVideo || !canvas) return;
+
+    // Avoid re-seeking if the rounded time hasn't changed (within 1s buckets)
+    const bucketTime = Math.floor(targetTime);
+    if (bucketTime === lastPreviewTimeRef.current) return;
+    lastPreviewTimeRef.current = bucketTime;
+
+    // Debounce the seek to avoid hammering the preview video
+    if (previewSeekTimeoutRef.current) {
+      clearTimeout(previewSeekTimeoutRef.current);
+    }
+
+    previewSeekTimeoutRef.current = setTimeout(() => {
+      const handleSeeked = () => {
+        try {
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(previewVideo, 0, 0, canvas.width, canvas.height);
+            setPreviewUrl(canvas.toDataURL("image/jpeg", 0.6));
+          }
+        } catch {
+          // CORS or other errors - silently ignore
+        }
+        previewVideo.removeEventListener("seeked", handleSeeked);
+      };
+
+      previewVideo.addEventListener("seeked", handleSeeked);
+      previewVideo.currentTime = targetTime;
+    }, 80);
+  }, []);
 
   // Handle HLS and source loading
   useEffect(() => {
@@ -419,10 +513,18 @@ export function VideoPlayer({
 
     setHoverTime(targetTime);
     setHoverX((x / rect.width) * 100);
+
+    // Generate preview thumbnail
+    generatePreview(targetTime);
   };
 
   const handleTimelineMouseLeave = () => {
     setHoverTime(null);
+    setPreviewUrl(null);
+    lastPreviewTimeRef.current = -1;
+    if (previewSeekTimeoutRef.current) {
+      clearTimeout(previewSeekTimeoutRef.current);
+    }
   };
 
   // Keyboard controls
@@ -671,13 +773,27 @@ export function VideoPlayer({
               style={{ left: `${progress}%` }}
             />
 
-            {/* Hover Tooltip */}
+            {/* Hover Preview Tooltip with Thumbnail */}
             {hoverTime !== null && (
               <div
-                className="absolute bottom-7 -translate-x-1/2 bg-black/90 text-white text-xs font-semibold px-2.5 py-1.5 rounded border border-white/10 shadow-xl pointer-events-none whitespace-nowrap"
-                style={{ left: `${hoverX}%` }}
+                className="absolute bottom-7 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none z-50"
+                style={{ left: `clamp(80px, ${hoverX}%, calc(100% - 80px))` }}
               >
-                {formatTime(hoverTime)}
+                {/* Thumbnail preview */}
+                {previewUrl && (
+                  <div className="rounded-md overflow-hidden border border-white/20 shadow-2xl bg-black">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-[192px] h-[108px] object-cover"
+                      draggable={false}
+                    />
+                  </div>
+                )}
+                {/* Time label */}
+                <div className="bg-black/90 text-white text-xs font-semibold px-2.5 py-1.5 rounded border border-white/10 shadow-xl whitespace-nowrap">
+                  {formatTime(hoverTime)}
+                </div>
               </div>
             )}
 
