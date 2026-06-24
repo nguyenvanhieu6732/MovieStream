@@ -9,6 +9,7 @@ import HeaderWrapper from "@/components/layout/HeaderWrapper"
 import FooterWrapper from "@/components/layout/FooterWrapper"
 import PageTransition from "@/components/layout/PageTransition"
 import WebMCPProvider from "@/components/agent/WebMCPProvider"
+import WebMCPInlineScript from "@/components/agent/WebMCPInlineScript"
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        <WebMCPInlineScript />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <SplashProvider>
