@@ -1,17 +1,10 @@
 import { NextResponse } from "next/server"
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+export async function GET(request: Request) {
+  const host = request.headers.get("host") || new URL(request.url).host
+  const protocol = request.headers.get("x-forwarded-proto") || (request.url.startsWith("https") ? "https" : "http")
+  const siteUrl = `${protocol}://${host}`
 
-/**
- * OpenID Connect Discovery Document
- * RFC 8414 + OpenID Connect Discovery 1.0
- * 
- * MovieStream uses NextAuth.js which provides OIDC-compatible authentication.
- * This document describes the authorization server metadata for AI agents.
- */
-export async function GET() {
   const config = {
     issuer: siteUrl,
     authorization_endpoint: `${siteUrl}/api/auth/signin`,

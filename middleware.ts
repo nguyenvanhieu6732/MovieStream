@@ -50,6 +50,28 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // 0.5. Handle CORS preflight OPTIONS requests immediately
+  if (request.method === "OPTIONS") {
+    if (
+      pathname.startsWith("/.well-known") ||
+      pathname.startsWith("/api/") ||
+      pathname === "/sitemap.xml" ||
+      pathname === "/robots.txt" ||
+      pathname === "/auth.md" ||
+      pathname === "/DNS-AID.md"
+    ) {
+      return new NextResponse(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, MCP-Session-Id",
+          "Access-Control-Max-Age": "86400",
+        },
+      })
+    }
+  }
+
   // 1. Kiểm tra auth cho các route yêu cầu đăng nhập
   const needsAuth = AUTH_REQUIRED.some((p) => pathname.startsWith(p))
   if (needsAuth) {

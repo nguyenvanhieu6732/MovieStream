@@ -1,22 +1,10 @@
 import { NextResponse } from "next/server"
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
-
-/**
- * Markdown content negotiation endpoint.
- *
- * When an AI agent requests a page with Accept: text/markdown,
- * this endpoint returns a clean markdown representation of that page.
- *
- * Usage: GET /api/markdown?path=/movie/some-slug
- *        Accept: text/markdown
- *
- * This is also referenced in Link headers via:
- *   rel="alternate"; type="text/markdown"
- */
 export async function GET(request: Request) {
+  const host = request.headers.get("host") || new URL(request.url).host
+  const protocol = request.headers.get("x-forwarded-proto") || (request.url.startsWith("https") ? "https" : "http")
+  const siteUrl = `${protocol}://${host}`
+
   const { searchParams } = new URL(request.url)
   const path = searchParams.get("path") || "/"
 

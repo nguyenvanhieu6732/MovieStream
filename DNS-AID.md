@@ -19,7 +19,7 @@ This record points AI agents to the well-known agent capabilities index.
 _index._agents.moviestream.app.  IN  TXT  "v=aid1 url=https://moviestream.app/.well-known/agent-skills/index.json"
 
 ; HTTPS/SVCB record (preferred, RFC 9460)
-_index._agents.moviestream.app.  IN  HTTPS  1  .  alpn="h2,h3" port=443
+_index._agents.moviestream.app.  3600  IN  HTTPS  1  moviestream.app.  alpn="h2,h3" port=443 mandatory=alpn,port
 ```
 
 ### 2. `_a2a._agents` — Agent-to-Agent Communication
@@ -31,7 +31,7 @@ This record describes the Agent-to-Agent (A2A) communication endpoint.
 _a2a._agents.moviestream.app.  IN  TXT  "v=a2a1 mcp=https://moviestream.app/api/mcp transport=http"
 
 ; HTTPS/SVCB record
-_a2a._agents.moviestream.app.  IN  HTTPS  1  .  alpn="h2,h3" port=443
+_a2a._agents.moviestream.app.  3600  IN  HTTPS  1  moviestream.app.  alpn="h2,h3" port=443 mandatory=alpn,port
 ```
 
 ### 3. `_mcp._agents` — MCP Server Discovery (Recommended)
@@ -66,14 +66,14 @@ $TTL 3600
 www                IN  CNAME  @
 
 ; Agent discovery records
-_index._agents     IN  TXT    "v=aid1 url=https://moviestream.app/.well-known/agent-skills/index.json"
-_index._agents     IN  HTTPS  1  .  alpn="h2,h3" port=443
+_index._agents     3600 IN  TXT    "v=aid1 url=https://moviestream.app/.well-known/agent-skills/index.json"
+_index._agents     3600 IN  HTTPS  1  moviestream.app.  alpn="h2,h3" port=443 mandatory=alpn,port
 
-_a2a._agents       IN  TXT    "v=a2a1 mcp=https://moviestream.app/api/mcp transport=http"
-_a2a._agents       IN  HTTPS  1  .  alpn="h2,h3" port=443
+_a2a._agents       3600 IN  TXT    "v=a2a1 mcp=https://moviestream.app/api/mcp transport=http"
+_a2a._agents       3600 IN  HTTPS  1  moviestream.app.  alpn="h2,h3" port=443 mandatory=alpn,port
 
-_mcp._agents       IN  TXT    "v=mcp1 card=https://moviestream.app/.well-known/mcp/server-card.json"
-_oauth._agents     IN  TXT    "v=oauth2 as=https://moviestream.app/.well-known/oauth-authorization-server"
+_mcp._agents       3600 IN  TXT    "v=mcp1 card=https://moviestream.app/.well-known/mcp/server-card.json"
+_oauth._agents     3600 IN  TXT    "v=oauth2 as=https://moviestream.app/.well-known/oauth-authorization-server"
 ```
 
 ---

@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server"
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
-
-/**
- * MCP HTTP endpoint.
- * Handles JSON-RPC style MCP requests from AI agents.
- * 
- * This is referenced by /.well-known/mcp/server-card.json
- */
 export async function POST(request: Request) {
+  const urlObj = new URL(request.url)
+  const siteUrl = `${urlObj.protocol}//${urlObj.host}`
   try {
     const body = await request.json()
     const { method, params, id } = body
@@ -185,7 +177,9 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const urlObj = new URL(request.url)
+  const siteUrl = `${urlObj.protocol}//${urlObj.host}`
   return NextResponse.json(
     {
       name: "MovieStream MCP Server",

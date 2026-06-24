@@ -125,6 +125,10 @@ GET /api/auth/signout
 `
 
 export async function GET(request: Request) {
+  const host = request.headers.get("host") || new URL(request.url).host
+  const protocol = request.headers.get("x-forwarded-proto") || (request.url.startsWith("https") ? "https" : "http")
+  const siteUrl = `${protocol}://${host}`
+
   const acceptHeader = request.headers.get("accept") ?? ""
 
   // Return markdown for agents requesting text/markdown
