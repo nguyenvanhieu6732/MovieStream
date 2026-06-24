@@ -152,6 +152,8 @@ This page is available at: ${siteUrl}${safePath}
 `
   }
 
+  const tokens = Math.ceil(markdown.length / 4)
+
   return new NextResponse(markdown, {
     status: 200,
     headers: {
@@ -159,6 +161,7 @@ This page is available at: ${siteUrl}${safePath}
       "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
       "Access-Control-Allow-Origin": "*",
       "Link": `<${siteUrl}${safePath}>; rel="canonical"`,
+      "x-markdown-tokens": tokens.toString(),
     },
   })
 }

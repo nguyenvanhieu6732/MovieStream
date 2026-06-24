@@ -191,7 +191,7 @@ export async function GET() {
       name: "MovieStream MCP Server",
       version: "1.0.0",
       protocolVersion: "2024-11-05",
-      serverCard: `${siteUrl}/.well-known/mcp/server-card`,
+      serverCard: `${siteUrl}/.well-known/mcp/server-card.json`,
     },
     {
       headers: {

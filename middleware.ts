@@ -27,6 +27,29 @@ const PUBLIC_LINK_PREFIXES = ["/", "/home", "/movies", "/movie", "/search", "/wa
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // 0. Markdown Content Negotiation rewrite
+  const acceptHeader = request.headers.get("accept") ?? ""
+  if (acceptHeader.includes("text/markdown")) {
+    if (
+      !pathname.startsWith("/api/") &&
+      !pathname.startsWith("/.well-known/") &&
+      !pathname.startsWith("/_next/") &&
+      pathname !== "/favicon.ico" &&
+      pathname !== "/robots.txt" &&
+      pathname !== "/sitemap.xml" &&
+      pathname !== "/manifest.webmanifest" &&
+      pathname !== "/auth.md" &&
+      pathname !== "/DNS-AID.md"
+    ) {
+      const rewriteUrl = new URL(`/api/markdown`, request.url)
+      rewriteUrl.searchParams.set("path", pathname)
+      for (const [key, val] of request.nextUrl.searchParams.entries()) {
+        rewriteUrl.searchParams.set(key, val)
+      }
+      return NextResponse.rewrite(rewriteUrl)
+    }
+  }
+
   // 1. Kiểm tra auth cho các route yêu cầu đăng nhập
   const needsAuth = AUTH_REQUIRED.some((p) => pathname.startsWith(p))
   if (needsAuth) {
@@ -59,7 +82,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/") ||
     pathname === "/sitemap.xml" ||
     pathname === "/robots.txt" ||
-    pathname === "/auth.md"
+    pathname === "/auth.md" ||
+    pathname === "/DNS-AID.md"
   ) {
     response.headers.set("Access-Control-Allow-Origin", "*")
     response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS")

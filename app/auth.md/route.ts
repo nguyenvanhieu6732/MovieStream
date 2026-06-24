@@ -6,7 +6,7 @@ import { NextResponse } from "next/server"
  * Referenced by OpenID configuration and OAuth AS metadata.
  */
 
-const MARKDOWN_CONTENT = `# MovieStream Authentication Guide
+const MARKDOWN_CONTENT = `# MovieStream auth.md - Authentication Guide
 
 > This document describes how AI agents and third-party clients can authenticate with MovieStream.
 
@@ -120,8 +120,8 @@ GET /api/auth/signout
 
 - [OpenAPI Specification](/.well-known/openapi.json)
 - [API Catalog](/.well-known/api-catalog)
-- [Agent Skills](/.well-known/agent-skills)
-- [MCP Server Card](/.well-known/mcp/server-card)
+- [Agent Skills](/.well-known/agent-skills/index.json)
+- [MCP Server Card](/.well-known/mcp/server-card.json)
 `
 
 export async function GET(request: Request) {
@@ -129,12 +129,14 @@ export async function GET(request: Request) {
 
   // Return markdown for agents requesting text/markdown
   if (acceptHeader.includes("text/markdown") || acceptHeader.includes("text/plain")) {
+    const tokens = Math.ceil(MARKDOWN_CONTENT.length / 4)
     return new NextResponse(MARKDOWN_CONTENT, {
       status: 200,
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
         "Cache-Control": "public, max-age=86400",
         "Access-Control-Allow-Origin": "*",
+        "x-markdown-tokens": tokens.toString(),
       },
     })
   }

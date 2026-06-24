@@ -69,6 +69,14 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=86400' },
         ],
       },
+      // DNS-AID.md: discovery doc
+      {
+        source: '/DNS-AID.md',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
       // API status: no-store
       {
         source: '/api/status',

@@ -74,6 +74,22 @@ export async function GET() {
 
     // UI locales
     ui_locales_supported: ["en", "vi"],
+
+    // Agent authentication configuration (auth.md protocol)
+    agent_auth: {
+      skill: `${siteUrl}/auth.md`,
+      register_uri: `${siteUrl}/api/agent/register`,
+      claim_uri: `${siteUrl}/api/agent/claim`,
+      revocation_uri: `${siteUrl}/api/auth/logout`,
+      identity_types_supported: ["anonymous", "identity_assertion"],
+      anonymous: {
+        credential_types_supported: ["api_key"],
+      },
+      identity_assertion: {
+        assertion_types_supported: ["urn:ietf:params:oauth:token-type:id-jag", "verified_email"],
+        credential_types_supported: ["bearer_token"],
+      },
+    },
   }
 
   return NextResponse.json(metadata, {

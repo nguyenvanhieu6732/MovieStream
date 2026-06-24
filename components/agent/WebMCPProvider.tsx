@@ -43,136 +43,155 @@ export function WebMCPProvider() {
 
     const mc = navigator.modelContext
 
-    // Tool: Search movies
-    mc.registerTool({
-      name: "moviestream_search",
-      description:
-        "Search the MovieStream catalog for movies and TV series. Returns titles, slugs, poster images, and metadata.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          keyword: {
-            type: "string",
-            description: "Search keyword — movie title, actor, genre, etc.",
+    // Define all MovieStream key tools
+    const tools: MCPTool[] = [
+      {
+        name: "moviestream_search",
+        description:
+          "Search the MovieStream catalog for movies and TV series. Returns titles, slugs, poster images, and metadata.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            keyword: {
+              type: "string",
+              description: "Search keyword — movie title, actor, genre, etc.",
+            },
           },
+          required: ["keyword"],
         },
-        required: ["keyword"],
-      },
-      execute: async ({ keyword }) => {
-        const res = await fetch(
-          `/api/search?keyword=${encodeURIComponent(String(keyword))}`
-        )
-        if (!res.ok) throw new Error("Search failed")
-        return res.json()
-      },
-    })
-
-    // Tool: Navigate to movie detail
-    mc.registerTool({
-      name: "moviestream_navigate_to_movie",
-      description:
-        "Navigate the browser to a specific movie's detail page on MovieStream.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          slug: {
-            type: "string",
-            description: "The movie or series URL slug",
-          },
+        execute: async ({ keyword }) => {
+          const res = await fetch(
+            `/api/search?keyword=${encodeURIComponent(String(keyword))}`
+          )
+          if (!res.ok) throw new Error("Search failed")
+          return res.json()
         },
-        required: ["slug"],
       },
-      execute: async ({ slug }) => {
-        window.location.href = `/movie/${slug}`
-        return { navigated: true, url: `/movie/${slug}` }
-      },
-    })
-
-    // Tool: Navigate to watch page
-    mc.registerTool({
-      name: "moviestream_watch",
-      description:
-        "Open the MovieStream video player for a specific movie or episode.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          slug: {
-            type: "string",
-            description: "Movie or episode slug to watch",
+      {
+        name: "moviestream_navigate_to_movie",
+        description:
+          "Navigate the browser to a specific movie's detail page on MovieStream.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            slug: {
+              type: "string",
+              description: "The movie or series URL slug",
+            },
           },
-          episode: {
-            type: "string",
-            description: "Episode identifier (optional, for series)",
-          },
+          required: ["slug"],
         },
-        required: ["slug"],
-      },
-      execute: async ({ slug, episode }) => {
-        const url = episode
-          ? `/watch/${slug}?ep=${encodeURIComponent(String(episode))}`
-          : `/watch/${slug}`
-        window.location.href = url
-        return { navigated: true, url }
-      },
-    })
-
-    // Tool: Search with navigation
-    mc.registerTool({
-      name: "moviestream_go_to_search",
-      description: "Navigate to the MovieStream search page with a pre-filled query.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          query: {
-            type: "string",
-            description: "Search query to pre-fill",
-          },
+        execute: async ({ slug }) => {
+          window.location.href = `/movie/${slug}`
+          return { navigated: true, url: `/movie/${slug}` }
         },
-        required: ["query"],
       },
-      execute: async ({ query }) => {
-        const url = `/search?q=${encodeURIComponent(String(query))}`
-        window.location.href = url
-        return { navigated: true, url }
+      {
+        name: "moviestream_watch",
+        description:
+          "Open the MovieStream video player for a specific movie or episode.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            slug: {
+              type: "string",
+              description: "Movie or episode slug to watch",
+            },
+            episode: {
+              type: "string",
+              description: "Episode identifier (optional, for series)",
+            },
+          },
+          required: ["slug"],
+        },
+        execute: async ({ slug, episode }) => {
+          const url = episode
+            ? `/watch/${slug}?ep=${encodeURIComponent(String(episode))}`
+            : `/watch/${slug}`
+          window.location.href = url
+          return { navigated: true, url }
+        },
       },
-    })
+      {
+        name: "moviestream_go_to_search",
+        description: "Navigate to the MovieStream search page with a pre-filled query.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query to pre-fill",
+            },
+          },
+          required: ["query"],
+        },
+        execute: async ({ query }) => {
+          const url = `/search?q=${encodeURIComponent(String(query))}`
+          window.location.href = url
+          return { navigated: true, url }
+        },
+      },
+      {
+        name: "moviestream_get_page_context",
+        description:
+          "Get information about the current MovieStream page — title, type, and available actions.",
+        inputSchema: {
+          type: "object",
+          properties: {},
+        },
+        execute: async () => {
+          return {
+            url: window.location.href,
+            pathname: window.location.pathname,
+            title: document.title,
+            site: "MovieStream",
+            description:
+              "MovieStream — Watch the latest movies and TV series online",
+            capabilities: [
+              "search",
+              "browse",
+              "watch",
+              "watchlist",
+              "comments",
+            ],
+          }
+        },
+      },
+    ]
 
-    // Tool: Get page context
-    mc.registerTool({
-      name: "moviestream_get_page_context",
-      description:
-        "Get information about the current MovieStream page — title, type, and available actions.",
-      inputSchema: {
-        type: "object",
-        properties: {},
-      },
-      execute: async () => {
-        return {
-          url: window.location.href,
-          pathname: window.location.pathname,
-          title: document.title,
-          site: "MovieStream",
-          description:
-            "MovieStream — Watch the latest movies and TV series online",
-          capabilities: [
-            "search",
-            "browse",
-            "watch",
-            "watchlist",
-            "comments",
-          ],
+    // 1. Call provideContext if available (preferred by newer spec drafts and scanner validation)
+    const mcAny = mc as any
+    if (typeof mcAny.provideContext === "function") {
+      try {
+        mcAny.provideContext({ tools })
+        console.log("WebMCP tools registered via provideContext")
+      } catch (error) {
+        console.error("WebMCP provideContext error:", error)
+      }
+    }
+
+    // 2. Call registerTool for each tool as a fallback
+    if (typeof mc.registerTool === "function") {
+      for (const tool of tools) {
+        try {
+          mc.registerTool(tool)
+        } catch (error) {
+          console.error(`WebMCP registerTool error for ${tool.name}:`, error)
         }
-      },
-    })
+      }
+      console.log("WebMCP tools registered via registerTool")
+    }
 
     // Cleanup: unregister tools when component unmounts
     return () => {
       if (mc.unregisterTool) {
-        mc.unregisterTool("moviestream_search")
-        mc.unregisterTool("moviestream_navigate_to_movie")
-        mc.unregisterTool("moviestream_watch")
-        mc.unregisterTool("moviestream_go_to_search")
-        mc.unregisterTool("moviestream_get_page_context")
+        for (const tool of tools) {
+          try {
+            mc.unregisterTool(tool.name)
+          } catch (e) {
+            // Ignore
+          }
+        }
       }
     }
   }, [])
