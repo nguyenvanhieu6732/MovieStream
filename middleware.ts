@@ -141,6 +141,7 @@ export const config = {
     // Discovery routes
     "/.well-known/:path*",
     "/auth.md",
+    "/DNS-AID.md",
     "/sitemap.xml",
     "/robots.txt",
     // API routes (CORS)

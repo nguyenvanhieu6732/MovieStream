@@ -23,9 +23,18 @@ export async function GET(request: Request) {
       {
         name: "dns-aid",
         type: "skill-md",
-        description: "DNS for AI Discovery (DNS-AID) records for DNS-based agent discovery documentation and configuration instructions.",
+        description:
+          "DNS for AI Discovery (DNS-AID) records for DNS-based agent discovery. " +
+          "Publishes SVCB/HTTPS ServiceMode records under the _agents namespace with alpn " +
+          "and endpoint parameters per draft-mozleywilliams-dnsop-dnsaid-02 and RFC 9460.",
         url: `${siteUrl}/DNS-AID.md`,
         digest: dnsAidDigest ? `sha256:${dnsAidDigest}` : "",
+        spec: "https://datatracker.ietf.org/doc/draft-mozleywilliams-dnsop-dnsaid/",
+        dnsRecords: {
+          _index: `_index._agents.${host}`,
+          _mcp: `_mcp._agents.${host}`,
+          _a2a: `_a2a._agents.${host}`,
+        },
       },
     ],
   }
