@@ -67,9 +67,6 @@ export function SearchDropdown({
                   {movie.year || "Đang cập nhật"}
                 </span>
               </div>
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.075] text-sm text-white/60 transition group-hover:border-primary/45 group-hover:bg-primary group-hover:text-white">
-                -&gt;
-              </span>
             </Link>
           ))}
         </div>

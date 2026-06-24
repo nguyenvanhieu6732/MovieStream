@@ -137,9 +137,8 @@ export function Navigation() {
         className="fixed left-0 right-0 top-4 z-[1000] px-3 text-white md:px-6"
       >
         <div
-          className={`spatial-container rounded-[1.75rem] px-3 md:px-5 ${
-            scrolled || isMenuOpen ? "glass-panel" : "border border-white/8 bg-black/10 backdrop-blur-xl"
-          }`}
+          className={`spatial-container rounded-[1.75rem] px-3 md:px-5 ${scrolled || isMenuOpen ? "glass-panel" : "border border-white/8 bg-black/10 backdrop-blur-xl"
+            }`}
         >
           <div className="flex h-[68px] items-center justify-between gap-4">
             <Link href="/" className="group flex items-center gap-3" onClick={closeMenu}>
@@ -193,7 +192,7 @@ export function Navigation() {
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild className="dropdown-menu-trigger">
                     <Avatar className="avatar mx-2 flex h-11 w-11 cursor-pointer items-center justify-center border border-white/16 bg-white/10 shadow-[0_16px_38px_rgba(0,0,0,0.28)]">
-                      <AvatarImage src={session?.user?.image ?? "/placeholder.svg"} />
+                      <AvatarImage src={session?.user?.image ?? session?.user?.name?.charAt(0)} />
                       <AvatarFallback>{session?.user?.name?.charAt(0) ?? "U"}</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>

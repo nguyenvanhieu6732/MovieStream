@@ -8,6 +8,7 @@ import { Toaster } from "sonner"
 import HeaderWrapper from "@/components/layout/HeaderWrapper"
 import FooterWrapper from "@/components/layout/FooterWrapper"
 import PageTransition from "@/components/layout/PageTransition"
+import WebMCPProvider from "@/components/agent/WebMCPProvider"
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -40,6 +41,7 @@ export default function RootLayout({
               <PageTransition>{children}</PageTransition>
               <FooterWrapper />
               <Toaster richColors position="top-center" />
+              <WebMCPProvider />
             </SplashProvider>
           </AuthProvider>
         </ThemeProvider>

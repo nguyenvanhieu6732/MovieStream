@@ -48,6 +48,46 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react'],
     scrollRestoration: true,
   },
+
+  // Next.js headers config: CORS + Cache-Control for agent discovery endpoints
+  async headers() {
+    return [
+      // Discovery endpoints: cache + CORS
+      {
+        source: '/.well-known/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, OPTIONS' },
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
+        ],
+      },
+      // auth.md: content negotiation hint
+      {
+        source: '/auth.md',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+      // API status: no-store
+      {
+        source: '/api/status',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+        ],
+      },
+      // MCP endpoint: CORS for cross-origin agents
+      {
+        source: '/api/mcp',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, MCP-Session-Id' },
+        ],
+      },
+    ]
+  },
 }
 
 export default withPWA(nextConfig)
