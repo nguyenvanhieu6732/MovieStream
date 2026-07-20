@@ -3,7 +3,7 @@ import * as constants from "@/lib/constants";
 const BASE_URL = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
 const movieSlug = constants.MOVIE_SLUG;
 const YEAR = 2025;
-const LIMIT = 10;
+const LIMIT = 20;
 const COUNTRY = constants.COUNTRY;
 
 function listUrl(
