@@ -2,16 +2,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { getMovie, movieUrl } from "@/lib/movieApi";
 
 async function fetchMovieBySlug(slug: string) {
   try {
-    const res = await fetch(`https://ophim1.com/v1/api/phim/${encodeURIComponent(slug)}`, {
+    const res = await fetch(movieUrl(slug), {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
 
     const data = await res.json();
-    return data?.data?.item || null;
+    return getMovie(data);
   } catch {
     return null;
   }

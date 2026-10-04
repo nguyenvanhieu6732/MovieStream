@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getMovie, movieUrl } from "@/lib/movieApi"
 
 export async function GET(request: Request) {
   const host = request.headers.get("host") || new URL(request.url).host
@@ -54,13 +55,12 @@ See [Authentication Guide](${siteUrl}/auth.md) for OAuth and credential requirem
   } else if (safePath.startsWith("/movie/")) {
     const slug = safePath.replace("/movie/", "")
     try {
-      const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api"
-      const res = await fetch(`${OPHIM_API}/phim/${slug}`, {
+      const res = await fetch(movieUrl(slug), {
         next: { revalidate: 3600 },
       })
       if (res.ok) {
         const json = await res.json()
-        const movie = json?.data?.item
+        const movie = getMovie(json)
         if (movie) {
           markdown = `# ${movie.name}
 

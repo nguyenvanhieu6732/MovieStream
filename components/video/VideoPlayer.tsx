@@ -15,6 +15,7 @@ import {
 
 type VideoPlayerProps = {
   src?: string | null;
+  embedSrc?: string | null;
   poster?: string;
   title?: string;
   autoPlay?: boolean;
@@ -41,7 +42,25 @@ const formatTime = (value: number) => {
     .padStart(2, "0")}`;
 };
 
-export function VideoPlayer({
+// Nguồn chỉ có link nhúng (không có m3u8) thì phát bằng iframe của nhà cung cấp
+export function VideoPlayer({ embedSrc, ...props }: VideoPlayerProps) {
+  if (!props.src && embedSrc) {
+    return (
+      <iframe
+        src={embedSrc}
+        title={props.title || "Trình phát video"}
+        className={`h-full w-full border-0 bg-black ${props.className || ""}`}
+        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+        allowFullScreen
+        referrerPolicy="origin"
+      />
+    );
+  }
+
+  return <HlsVideoPlayer {...props} />;
+}
+
+function HlsVideoPlayer({
   src,
   poster,
   title = "Trình phát video",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { OPhimMovie } from "@/lib/interface";
+import { getItems, getTotalPages, listUrl } from "@/lib/movieApi";
 import MovieGrid from "@/components/detailMovie/movie-grid";
 import { Pagination } from "@/components/detailMovie/pagination";
 import { LoadingEffect } from "@/components/effect/loading-effect";
@@ -9,23 +10,15 @@ import { MOVIE_SLUG_LABEL } from "@/lib/constants";
 import ScrollRestore from "@/components/scrollEffect/ScrollRestore";
 
 async function fetchMovies(countrySlug: string, page: number, movieSlug?: string, signal?: AbortSignal) {
-  const params = new URLSearchParams({
-    page: String(page),
-    limit: "30",
-    sort_field: "modified.time",
-    sort_type: "desc",
-    year: "2025",
-    country: countrySlug,
-  });
-  const apiUrl = `https://ophim1.com/v1/api/danh-sach/${movieSlug}?${params.toString()}`;
+  const apiUrl = listUrl(movieSlug || "phim-moi-cap-nhat", { page, country: countrySlug });
 
   const res = await fetch(apiUrl, { signal });
   if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
   const data = await res.json();
 
   return {
-    movies: data.data?.items || [],
-    totalPages: 2,
+    movies: getItems<OPhimMovie>(data),
+    totalPages: getTotalPages(data),
   };
 }
 
@@ -71,7 +64,7 @@ export default function MoviesPage({ searchParams }: { searchParams: { country?:
             {movieSlug
               ? `${MOVIE_SLUG_LABEL[movieSlug] || movieSlug} mới nhất`
               : country
-                ? `Phim ${movies[0]?.country?.[0]?.name} mới nhất`
+                ? `Phim ${movies[0]?.country?.[0]?.name || MOVIE_SLUG_LABEL[`phim-${country}`]?.replace(/^Phim /, "") || country} mới nhất`
                 : "Tất cả phim"}
           </h1>
         </div>

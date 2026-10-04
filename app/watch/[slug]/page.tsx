@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import WatchClient from "./WatchClient";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import { fetchRelatedMovies } from "@/lib/relatedMovies";
-
-const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
+import { MOVIE_API, getMovie, movieUrl } from "@/lib/movieApi";
 
 type MoviePerson = {
   tmdb_people_id: number;
@@ -17,18 +16,12 @@ type MoviePerson = {
 
 async function fetchWatchMovie(slug: string) {
   try {
-    const res = await fetch(`https://ophim1.com/phim/${encodeURIComponent(slug)}`, {
+    const res = await fetch(movieUrl(slug), {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
 
-    const json = await res.json();
-    if (!json?.movie) return null;
-
-    return {
-      ...json.movie,
-      episodes: json.episodes,
-    };
+    return getMovie(await res.json());
   } catch (error) {
     console.error("[watch page] fetch movie failed:", error);
     return null;
@@ -37,7 +30,7 @@ async function fetchWatchMovie(slug: string) {
 
 async function fetchPeoples(slug: string): Promise<MoviePerson[]> {
   try {
-    const res = await fetch(`${OPHIM_API}/phim/${encodeURIComponent(slug)}/peoples`, {
+    const res = await fetch(`${MOVIE_API}/phim/${encodeURIComponent(slug)}/peoples`, {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return [];

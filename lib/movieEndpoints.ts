@@ -1,36 +1,8 @@
 import * as constants from "@/lib/constants";
+import { listUrl } from "@/lib/movieApi";
 
-const BASE_URL = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
 const movieSlug = constants.MOVIE_SLUG;
-const YEAR = 2025;
-const LIMIT = 20;
 const COUNTRY = constants.COUNTRY;
-
-function listUrl(
-  slug: string,
-  params: Partial<{
-    page: number;
-    limit: number;
-    sort_field: string;
-    sort_type: string;
-    year: number;
-    country: string;
-  }> = {}
-) {
-  const searchParams = new URLSearchParams({
-    page: String(params.page ?? 1),
-    limit: String(params.limit ?? LIMIT),
-    sort_field: params.sort_field ?? constants.SORT_FIELD.MODIFIED_TIME,
-    sort_type: params.sort_type ?? constants.SORT_TYPE.DESC,
-    year: String(params.year ?? YEAR),
-  });
-
-  if (params.country) {
-    searchParams.set("country", params.country);
-  }
-
-  return `${BASE_URL}/danh-sach/${slug}?${searchParams.toString()}`;
-}
 
 export const movieEndpoints = [
   {

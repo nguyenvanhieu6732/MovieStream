@@ -413,8 +413,9 @@ async function doTogglePremium() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xl" onKeyDown={(e) => e.key === "Escape" && setShowPlayer(false)} tabIndex={0}>
             <div className="glass-panel relative aspect-video w-full max-w-4xl overflow-hidden rounded-[2rem] bg-black">
               <VideoPlayer
-                key={`${selectedEpisode}-${episodes[selectedEpisode]?.link_m3u8 || ""}`}
+                key={`${selectedEpisode}-${episodes[selectedEpisode]?.link_m3u8 || episodes[selectedEpisode]?.link_embed || ""}`}
                 src={episodes[selectedEpisode]?.link_m3u8}
+                embedSrc={episodes[selectedEpisode]?.link_embed}
                 poster={getImageUrl(movie.poster_url)}
                 title={`Xem phim ${movie.name}`}
               />

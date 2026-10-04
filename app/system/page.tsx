@@ -8,19 +8,18 @@ import {
   UsersRound,
 } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { getTotalItems, listUrl } from "@/lib/movieApi"
 
 const numberFormatter = new Intl.NumberFormat("vi-VN")
 
 async function getOPhimTotal() {
-  if (!process.env.NEXT_PUBLIC_OPHIM_API) return 0
-
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_OPHIM_API}/home`, {
+    const res = await fetch(listUrl("phim-moi-cap-nhat"), {
       next: { revalidate: 3600 },
     })
     if (!res.ok) return 0
     const json = await res.json()
-    return json?.data?.params?.pagination?.totalItems ?? 0
+    return getTotalItems(json)
   } catch {
     return 0
   }

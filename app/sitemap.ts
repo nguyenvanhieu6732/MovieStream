@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { getItems, listUrl } from "@/lib/movieApi"
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -37,15 +38,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Attempt to fetch a page of movies from the OPHIM API for dynamic URLs
   let dynamicRoutes: MetadataRoute.Sitemap = []
   try {
-    const OPHIM_API =
-      process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api"
-    const res = await fetch(`${OPHIM_API}/danh-sach/phim-moi-cap-nhat?page=1`, {
+    const res = await fetch(listUrl("phim-moi-cap-nhat"), {
       next: { revalidate: 3600 },
     })
     if (res.ok) {
       const json = await res.json()
       const items: Array<{ slug: string; modified?: { time: string } }> =
-        json?.data?.items || []
+        getItems(json)
 
       dynamicRoutes = items.map((item) => ({
         url: `${siteUrl}/movie/${item.slug}`,

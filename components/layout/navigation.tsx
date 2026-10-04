@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { Heart, LogOut, Menu, Search, Settings, User, X } from "lucide-react"
 import { motion } from "framer-motion"
+import { getItems, searchUrl } from "@/lib/movieApi"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -89,11 +90,11 @@ export function Navigation() {
     const controller = new AbortController()
     const fetchResults = async () => {
       try {
-        const res = await fetch(`https://ophim1.com/v1/api/tim-kiem?keyword=${debouncedQuery}`, {
+        const res = await fetch(searchUrl(debouncedQuery), {
           signal: controller.signal,
         })
         const json = await res.json()
-        setSearchResults(json.data?.items?.slice(0, 5) || [])
+        setSearchResults(getItems(json).slice(0, 5))
         setShowDropdown(true)
       } catch (err) {
         if (controller.signal.aborted) return

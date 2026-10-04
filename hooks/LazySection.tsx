@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import MovieCarousel from "@/components/scrollEffect/MovieCarousel";
 import { OPhimMovie } from "@/lib/interface";
+import { getItems } from "@/lib/movieApi";
 import { LoadingEffect } from "@/components/effect/loading-effect";
 import { useDeviceType } from "./use-mobile";
 
@@ -35,7 +36,7 @@ export default function LazyCarousels({ carousels }: { carousels: CarouselConfig
               if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
               return res.json();
             })
-            .then(data => [c.title, data.data?.items || []] as [string, OPhimMovie[]])
+            .then(data => [c.title, getItems<OPhimMovie>(data)] as [string, OPhimMovie[]])
         )
       )
         .then(results => {

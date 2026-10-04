@@ -169,10 +169,11 @@ export default function WatchClient({
             ) : canWatch ? (
               /* ================= ĐANG PLAY ================= */
 
-              currentEpisode?.link_m3u8 ? (
+              currentEpisode?.link_m3u8 || currentEpisode?.link_embed ? (
                 <VideoPlayer
-                  key={`${selectedEpisode}-${currentEpisode.link_m3u8}`}
+                  key={`${selectedEpisode}-${currentEpisode.link_m3u8 || currentEpisode.link_embed}`}
                   src={currentEpisode.link_m3u8}
+                  embedSrc={currentEpisode.link_embed}
                   poster={getImageUrl(movie.poster_url)}
                   title={`Xem phim ${movie.name} - Tập ${currentEpisodeName}`}
                 />

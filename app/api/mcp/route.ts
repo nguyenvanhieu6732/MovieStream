@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getItems, listUrl, searchUrl } from "@/lib/movieApi"
 
 export async function POST(request: Request) {
   const urlObj = new URL(request.url)
@@ -67,9 +68,8 @@ export async function POST(request: Request) {
 
         if (name === "search_movies") {
           const keyword = args?.keyword || ""
-          const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api"
           const res = await fetch(
-            `${OPHIM_API}/tim-kiem?keyword=${encodeURIComponent(keyword)}`,
+            searchUrl(keyword),
             { next: { revalidate: 300 } }
           )
           const json = await res.json()
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
               content: [
                 {
                   type: "text",
-                  text: JSON.stringify(json?.data?.items || [], null, 2),
+                  text: JSON.stringify(getItems(json), null, 2),
                 },
               ],
             },
@@ -88,14 +88,13 @@ export async function POST(request: Request) {
         }
 
         if (name === "get_trending") {
-          const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api"
           const limit = Math.min(Number(args?.limit) || 10, 50)
           const res = await fetch(
-            `${OPHIM_API}/danh-sach/phim-moi-cap-nhat?page=1`,
+            listUrl("phim-moi-cap-nhat"),
             { next: { revalidate: 300 } }
           )
           const json = await res.json()
-          const items = (json?.data?.items || []).slice(0, limit)
+          const items = getItems(json).slice(0, limit)
           return NextResponse.json({
             jsonrpc: "2.0",
             id,

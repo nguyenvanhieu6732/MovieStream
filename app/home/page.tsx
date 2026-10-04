@@ -2,52 +2,42 @@ import MovieSlider from "@/components/home/movie-slider";
 import MovieHorizontalSlider from "@/components/home/MovieHorizontalSlider";
 import { OPhimMovie } from "@/lib/interface";
 import { movieEndpoints } from "@/lib/movieEndpoints";
+import { getItems, getMovie, listUrl, movieUrl } from "@/lib/movieApi";
 import * as constants from "@/lib/constants";
 import LazyCarousels from "../../hooks/LazySection";
-
-const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
 
 type HomeApiMovie = OPhimMovie & {
   category?: OPhimMovie["categories"];
 };
 
-type HomeApiResponse = {
-  data?: {
-    items?: HomeApiMovie[];
-    APP_DOMAIN_CDN_IMAGE?: string;
-  };
-};
+async function fetchJson(url: string) {
+  const res = await fetch(url, { next: { revalidate: 3600 } });
+  if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+  return res.json();
+}
 
 async function fetchMovies(url: string): Promise<OPhimMovie[]> {
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-    const data = await res.json();
-    return data.data?.items || [];
+    return getItems<OPhimMovie>(await fetchJson(url));
   } catch (err) {
     console.error(err);
     return [];
   }
 }
 
-async function fetchHomeHero(): Promise<{
-  movies: OPhimMovie[];
-  imageBaseUrl?: string;
-}> {
+// vsmov không có /home: lấy phim mới cập nhật rồi tải chi tiết để có mô tả, thể loại
+async function fetchHomeHero(): Promise<{ movies: OPhimMovie[] }> {
   try {
-    const res = await fetch(`${OPHIM_API}/home`, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error(`Failed to fetch home: ${res.status}`);
+    const items = getItems<HomeApiMovie>(await fetchJson(listUrl("phim-moi-cap-nhat"))).slice(0, 5);
+    const details = await Promise.allSettled(
+      items.map(async (item) => getMovie<HomeApiMovie>(await fetchJson(movieUrl(item.slug))) || item)
+    );
+    const movies = details.map((result, index) => {
+      const movie = result.status === "fulfilled" ? result.value : items[index];
+      return { ...movie, categories: movie.categories || movie.category || [] };
+    });
 
-    const data = (await res.json()) as HomeApiResponse;
-    const movies = (data.data?.items || []).slice(0, 5).map((movie) => ({
-      ...movie,
-      categories: movie.categories || movie.category || [],
-    }));
-
-    return {
-      movies,
-      imageBaseUrl: data.data?.APP_DOMAIN_CDN_IMAGE,
-    };
+    return { movies };
   } catch (err) {
     console.error(err);
     return { movies: [] };
@@ -70,7 +60,7 @@ export default async function HomePageServer() {
 
   return (
     <div className="min-h-screen">
-      <MovieSlider movies={hero.movies} imageBaseUrl={hero.imageBaseUrl} />
+      <MovieSlider movies={hero.movies} />
 
       <MovieHorizontalSlider
         gradient={constants.GRADIENTS.PURPLE}

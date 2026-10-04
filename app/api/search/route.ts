@@ -1,7 +1,7 @@
 // app/api/search/route.ts
 import { NextResponse } from "next/server"
 
-const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api"
+import { getItems, searchUrl } from "@/lib/movieApi"
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   if (!keyword) return NextResponse.json({ data: [] })
 
   try {
-    const res = await fetch(`${OPHIM_API}/tim-kiem?keyword=${encodeURIComponent(keyword)}`, {
+    const res = await fetch(searchUrl(keyword), {
       next: { revalidate: 300 },
     })
 
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     }
 
     const json = await res.json()
-    return NextResponse.json({ data: json.data?.items || [] })
+    return NextResponse.json({ data: getItems(json) })
   } catch (error) {
     console.error("[GET /api/search] error:", error)
     return NextResponse.json({ data: [] }, { status: 500 })

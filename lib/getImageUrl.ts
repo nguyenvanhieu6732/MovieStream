@@ -1,7 +1,8 @@
 const OPHIM_IMAGE_CDN = "https://img.ophim.live"
 
 export const getImageUrl = (url?: string | null) => {
-  if (!url) return "/placeholder.svg"
+  // vsmov đôi khi trả poster_url là {} thay vì chuỗi
+  if (!url || typeof url !== "string") return "/placeholder.svg"
 
   const value = url.trim()
   if (!value) return "/placeholder.svg"

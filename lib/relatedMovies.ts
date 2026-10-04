@@ -1,6 +1,5 @@
 import { getImageUrl } from "@/lib/getImageUrl";
-
-const OPHIM_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
+import { MOVIE_API, getItems, listUrl } from "@/lib/movieApi";
 
 type MovieTaxonomy = {
   slug?: string;
@@ -39,7 +38,7 @@ async function fetchItems(url: string) {
     const res = await fetch(url, { next: { revalidate: 3600 } });
     if (!res.ok) return [];
     const data = await res.json();
-    return data.data?.items || data.items || [];
+    return getItems(data);
   } catch {
     return [];
   }
@@ -53,10 +52,11 @@ export async function fetchRelatedMovies(source: RelatedMovieSource, limit = 6):
   const typeSlug = getPrimaryType(source.type);
 
   const urls = [
-    categorySlug && `${OPHIM_API}/the-loai/${categorySlug}?page=1&limit=24${countrySlug ? `&country=${countrySlug}` : ""}`,
-    categorySlug && `${OPHIM_API}/the-loai/${categorySlug}?page=2&limit=24`,
-    `${OPHIM_API}/danh-sach/${typeSlug}?page=1&limit=24${countrySlug ? `&country=${countrySlug}` : ""}`,
-    `${OPHIM_API}/danh-sach/phim-moi-cap-nhat?page=1&limit=24`,
+    categorySlug && `${MOVIE_API}/the-loai/${categorySlug}?page=1`,
+    categorySlug && `${MOVIE_API}/the-loai/${categorySlug}?page=2`,
+    countrySlug && listUrl(typeSlug, { country: countrySlug }),
+    listUrl(typeSlug),
+    listUrl("phim-moi-cap-nhat"),
   ].filter(Boolean) as string[];
 
   const seen = new Set<string>();

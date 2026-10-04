@@ -31,6 +31,7 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 86400,
     remotePatterns: [
+      { protocol: 'https', hostname: 'vsmov.com' },
       { protocol: 'https', hostname: 'img.ophim.live' },
       { protocol: 'https', hostname: 'img.ophim.cc' },
       { protocol: 'https', hostname: 'img.ophim1.com' },

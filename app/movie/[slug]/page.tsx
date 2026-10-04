@@ -4,8 +4,7 @@ import MovieDetailClient from "./MovieDetailClient";
 import extractTextFromHtml from "@/lib/extractTextFromHtml";
 import type { MovieItem } from "@/lib/interface";
 import { fetchRelatedMovies } from "@/lib/relatedMovies";
-
-const API_URL = process.env.NEXT_PUBLIC_OPHIM_API || "https://ophim1.com/v1/api";
+import { getMovie, movieUrl } from "@/lib/movieApi";
 
 type Episode = {
   name?: string;
@@ -15,13 +14,13 @@ type Episode = {
 
 async function fetchMovie(slug: string): Promise<MovieItem | null> {
   try {
-    const res = await fetch(`${API_URL}/phim/${encodeURIComponent(slug)}`, {
+    const res = await fetch(movieUrl(slug), {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
 
     const data = await res.json();
-    return data?.data?.item || null;
+    return getMovie<MovieItem>(data);
   } catch (error) {
     console.error("[movie page] fetch movie failed:", error);
     return null;
