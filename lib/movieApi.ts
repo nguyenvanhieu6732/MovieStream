@@ -1,4 +1,14 @@
-export const MOVIE_API = process.env.NEXT_PUBLIC_OPHIM_API || "https://vsmov.com/api";
+const DEFAULT_MOVIE_API = "https://vsmov.com/api";
+
+// Chuẩn hóa biến môi trường: bỏ "/" cuối (vsmov trả 404 với "//danh-sach"),
+// thêm "/api" nếu thiếu, và bỏ qua domain ophim cũ đã ngừng hoạt động
+function resolveMovieApi(value?: string) {
+  const url = value?.trim().replace(/\/+$/, "");
+  if (!url || /ophim/i.test(url)) return DEFAULT_MOVIE_API;
+  return /\/api$/i.test(url) ? url : `${url}/api`;
+}
+
+export const MOVIE_API = resolveMovieApi(process.env.NEXT_PUBLIC_OPHIM_API);
 
 // Slug danh sách mà vsmov hỗ trợ qua /danh-sach/{slug}
 const LIST_SLUGS = new Set(["phim-moi", "phim-moi-cap-nhat", "phim-bo", "phim-le", "phim-chieu-rap", "subteam"]);
